@@ -281,7 +281,7 @@ const ColorModeIconButton: FC = () => {
 
   return (
     <IconButton
-      size="lg"
+      size="md"
       variant="ghost"
       color={useColorModeValue("gray.500", "gray.300")}
       aria-label="open menu"
