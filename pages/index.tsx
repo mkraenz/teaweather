@@ -46,17 +46,23 @@ const Home = () => {
           "main"
           "footer"
         `}
-        gridTemplateRows={"50px 1fr 30px"}
-        p={`0 20px 0`}
+        gridTemplateRows={"70px 1fr 30px"}
       >
-        <GridItem area="navbar">
-          <Navbar activePage="home" />
+        <GridItem area="navbar" as="nav">
+          <Navbar />
         </GridItem>
 
-        <GridItem area="main" as="main">
+        <GridItem
+          area="main"
+          as="main"
+          bg={
+            "linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(0,212,255,1) 100%);"
+          }
+        >
           <VStack
             justifyContent={"center"}
             gap="var(--chakra-space-16) !important"
+            pt={16}
           >
             <Heading as="h1" size="4xl" noOfLines={1}>
               TeaWeather

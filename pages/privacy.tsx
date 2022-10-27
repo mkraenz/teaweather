@@ -17,18 +17,24 @@ const PrivacyPolicy = () => {
         "main"
         "footer"
       `}
-        gridTemplateRows={"50px 1fr 30px"}
-        p={`0 20px 0`}
+        gridTemplateRows={"70px 1fr 30px"}
         minH="100vh"
         minW="100vw"
       >
         <GridItem area="navbar">
           <Navbar activePage={"privacy"} />
         </GridItem>
-        <GridItem area="main" as="main">
+        <GridItem
+          area="main"
+          as="main"
+          bg={
+            "linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(0,212,255,1) 100%);"
+          }
+        >
           <VStack
             justifyContent={"center"}
             gap="var(--chakra-space-16) !important"
+            pt={16}
           >
             <Heading size={"xl"} as="h1">
               Privacy Policy
