@@ -1,5 +1,6 @@
-import { Grid, GridItem, Heading, Text, VStack } from "@chakra-ui/react";
+import { Grid, GridItem, Text, VStack } from "@chakra-ui/react";
 import Head from "next/head";
+import Heading1 from "../components/common/Heading1";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 
@@ -20,25 +21,18 @@ const PrivacyPolicy = () => {
         gridTemplateRows={"70px 1fr 30px"}
         minH="100vh"
         minW="100vw"
+        bg={"linear-gradient(0deg, white 0%, #99eeff 100%);"}
       >
-        <GridItem area="navbar">
-          <Navbar activePage={"privacy"} />
+        <GridItem area="navbar" as="nav">
+          <Navbar />
         </GridItem>
-        <GridItem
-          area="main"
-          as="main"
-          bg={
-            "linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(0,212,255,1) 100%);"
-          }
-        >
+        <GridItem area="main" as="main">
           <VStack
             justifyContent={"center"}
             gap="var(--chakra-space-16) !important"
             pt={16}
           >
-            <Heading size={"xl"} as="h1">
-              Privacy Policy
-            </Heading>
+            <Heading1 text="Privacy Policy" />
             <VStack alignItems={"flex-start"}>
               <Text textAlign={"left"}>
                 Your privacy is important to us. It is TeaWeather&apos;s policy

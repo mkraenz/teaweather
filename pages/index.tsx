@@ -1,13 +1,7 @@
-import {
-  Grid,
-  GridItem,
-  Heading,
-  HStack,
-  Text,
-  useColorModeValue,
-  VStack,
-} from "@chakra-ui/react";
+import { Grid, GridItem, HStack, Text, VStack } from "@chakra-ui/react";
 import Head from "next/head";
+import Heading1 from "../components/common/Heading1";
+import Heading2 from "../components/common/Heading2";
 import Footer from "../components/Footer";
 import WeatherDetails from "../components/home/WeatherDetails";
 import WeatherIcon from "../components/home/WeatherIcon";
@@ -40,7 +34,8 @@ const Home = () => {
       <Grid
         minH="100vh"
         minW="100vw"
-        bg={useColorModeValue("gray.100", "gray.900")}
+        // TODO dark mode
+        bg={"linear-gradient(0deg, white 0%, #99eeff 100%);"}
         templateAreas={`
           "navbar"
           "main"
@@ -52,24 +47,14 @@ const Home = () => {
           <Navbar />
         </GridItem>
 
-        <GridItem
-          area="main"
-          as="main"
-          bg={
-            "linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(0,212,255,1) 100%);"
-          }
-        >
+        <GridItem area="main" as="main">
           <VStack
             justifyContent={"center"}
             gap="var(--chakra-space-16) !important"
             pt={16}
           >
-            <Heading as="h1" size="4xl" noOfLines={1}>
-              TeaWeather
-            </Heading>
-            <Heading as="h2" size="lg" noOfLines={1}>
-              Find the perfect weather for your afternoon tea.
-            </Heading>
+            <Heading1 text="TeaWeather" />
+            <Heading2 text="Find the perfect weather for your afternoon tea." />
             <HStack gap="20px" alignItems={"flex-start"}>
               <WeatherIcon weather={data.description} />
               <WeatherDetails {...data} />

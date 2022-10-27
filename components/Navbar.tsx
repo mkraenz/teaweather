@@ -28,9 +28,7 @@ export default function WithSubnavigation() {
   return (
     <Box data-testId="outernavbox" minW="100vw">
       <Flex
-        // TODO contrast
-        bg={useColorModeValue("rgba(0,212,255,1)", "gray.800")}
-        color={useColorModeValue("gray.600", "white")}
+        color={useColorModeValue("gray.900", "white")}
         minH={"60px"}
         py={{ base: 2 }}
         px={{ base: 4 }}
