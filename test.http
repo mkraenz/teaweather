@@ -1,0 +1,5 @@
+# set via vscode settings.json -> "rest-client.environmentVariables"
+# also ctrl shift P -> rest client: switch environment -> local
+@openweathermapapikey = {{openweatherapikey}}
+
+GET https://api.openweathermap.org/data/2.5/forecast?lat=51.5072&lon=-0.11&appid={{openweathermapapikey}}

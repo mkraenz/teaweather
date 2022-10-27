@@ -36,7 +36,10 @@ interface Props {
 }
 
 const WeatherIcon: FC<Props> = ({ weather }) => {
-  const iconData = weatherToIcon[weather as keyof typeof weatherToIcon];
+  const iconData =
+    weatherToIcon[weather as keyof typeof weatherToIcon] ||
+    // TODO
+    weatherToIcon["Mostly sunny"];
   return (
     <AmChartWeatherIcon
       size={100}

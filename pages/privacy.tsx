@@ -1,8 +1,8 @@
 import { Grid, GridItem, Text, VStack } from "@chakra-ui/react";
 import Head from "next/head";
-import Heading1 from "../components/common/Heading1";
-import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
+import Heading1 from "../src/components/common/Heading1";
+import Footer from "../src/components/Footer";
+import Navbar from "../src/components/Navbar";
 
 const PrivacyPolicy = () => {
   return (

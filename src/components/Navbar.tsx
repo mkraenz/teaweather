@@ -21,12 +21,15 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
+  const router = useRouter();
 
   return (
-    <Box data-testId="outernavbox" minW="100vw">
+    <Box minW="100vw">
       <Flex
         color={useColorModeValue("gray.900", "white")}
         minH={"60px"}
@@ -52,13 +55,15 @@ export default function WithSubnavigation() {
           />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <Text
-            textAlign={useBreakpointValue({ base: "center", md: "left" })}
-            fontFamily={"heading"}
-            color={useColorModeValue("gray.800", "white")}
-          >
-            Logo
-          </Text>
+          <NextLink href={"/"}>
+            <Text
+              textAlign={useBreakpointValue({ base: "center", md: "left" })}
+              fontFamily={"heading"}
+              color={useColorModeValue("gray.800", "white")}
+            >
+              TeaWeather
+            </Text>
+          </NextLink>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav />
@@ -74,7 +79,7 @@ export default function WithSubnavigation() {
           <Button
             as={"a"}
             fontSize={"sm"}
-            fontWeight={400}
+            fontWeight={600}
             variant={"link"}
             href={"#"}
           >
@@ -105,9 +110,14 @@ export default function WithSubnavigation() {
 }
 
 const DesktopNav = () => {
-  const linkColor = useColorModeValue("gray.600", "gray.200");
+  const linkColor = useColorModeValue("gray.700", "gray.200");
   const linkHoverColor = useColorModeValue("gray.800", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
+  const activePageLinkUnderlineColor = useColorModeValue(
+    "gray.500",
+    "gray.400"
+  );
+  const router = useRouter();
 
   return (
     <Stack direction={"row"} spacing={4}>
@@ -125,6 +135,10 @@ const DesktopNav = () => {
                   textDecoration: "none",
                   color: linkHoverColor,
                 }}
+                textDecoration={
+                  router.pathname === navItem.href ? "underline" : undefined
+                }
+                textDecorationColor={activePageLinkUnderlineColor}
               >
                 {navItem.label}
               </Link>
@@ -266,41 +280,35 @@ interface NavItem {
 
 const NAV_ITEMS: Array<NavItem> = [
   {
-    label: "Inspiration",
+    label: "Home",
+    href: "/",
+  },
+  {
+    label: "3 Hours",
+    href: "/three-hours",
+  },
+  {
+    label: "5 Days",
+    href: "/five-days",
+  },
+  {
+    label: "Learn more",
     children: [
       {
-        label: "Explore Design Work",
-        subLabel: "Trending Design to inspire you",
-        href: "#",
+        label: "Weather Reporting",
+        subLabel: "How weather reports are made",
+        href: "/learn/weather-reporting",
       },
       {
-        label: "New & Noteworthy",
-        subLabel: "Up-and-coming Designers",
-        href: "#",
+        label: "Climate",
+        subLabel: "What is climate and climate change?",
+        href: "/learn/climate",
+      },
+      {
+        label: "Career",
+        subLabel: "Get a job in weather ",
+        href: "/learn/career",
       },
     ],
-  },
-  {
-    label: "Find Work",
-    children: [
-      {
-        label: "Job Board",
-        subLabel: "Find your dream design job",
-        href: "#",
-      },
-      {
-        label: "Freelance Projects",
-        subLabel: "An exclusive list for contract work",
-        href: "#",
-      },
-    ],
-  },
-  {
-    label: "Learn Design",
-    href: "#",
-  },
-  {
-    label: "Hire Designers",
-    href: "#",
   },
 ];

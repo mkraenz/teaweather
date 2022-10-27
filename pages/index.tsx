@@ -1,29 +1,21 @@
 import { Grid, GridItem, HStack, Text, VStack } from "@chakra-ui/react";
+import type { NextPage } from "next";
 import Head from "next/head";
-import Heading1 from "../components/common/Heading1";
-import Heading2 from "../components/common/Heading2";
-import Footer from "../components/Footer";
-import WeatherDetails from "../components/home/WeatherDetails";
-import WeatherIcon from "../components/home/WeatherIcon";
-import { WeatherData } from "../components/interfaces";
-import Navbar from "../components/Navbar";
+import { ApiData } from "../src/api/types";
+import Heading1 from "../src/components/common/Heading1";
+import Heading2 from "../src/components/common/Heading2";
+import Footer from "../src/components/Footer";
+import WeatherDetails from "../src/components/home/WeatherDetails";
+import WeatherIcon from "../src/components/home/WeatherIcon";
+import { WeatherData } from "../src/components/interfaces";
+import Navbar from "../src/components/Navbar";
+import type weatherCurrentApi from "./api/weather-current";
 
-const Home = () => {
-  const data: WeatherData = {
-    location: "London, UK",
-    time: "Wednesday, 14:00",
-    description: "Mostly sunny",
-    temperature: 20,
-    temperatureUnit: "°C",
-    humidity: 50,
-    humidityUnit: "%",
-    pressure: 1000,
-    pressureUnit: "hPa",
-    wind: 10,
-    windUnit: "km/h",
-    windDirection: "N",
-    precipitationProbabilityInPercent: 10,
-  };
+interface Props {
+  weather: WeatherData;
+}
+
+const Home: NextPage<Props> = ({ weather }) => {
   return (
     <>
       <Head>
@@ -56,14 +48,14 @@ const Home = () => {
             <Heading1 text="TeaWeather" />
             <Heading2 text="Find the perfect weather for your afternoon tea." />
             <HStack gap="20px" alignItems={"flex-start"}>
-              <WeatherIcon weather={data.description} />
-              <WeatherDetails {...data} />
+              <WeatherIcon weather={weather.description} />
+              <WeatherDetails {...weather} />
               <VStack alignItems={"flex-end"}>
                 <Text as="h3" fontSize={"2xl"}>
-                  {data.location}
+                  {weather.location}
                 </Text>
-                <Text>{data.time}</Text>
-                <Text fontSize={"lg"}>{data.description}</Text>
+                <Text>{weather.time}</Text>
+                <Text fontSize={"lg"}>{weather.description}</Text>
               </VStack>
             </HStack>
           </VStack>
@@ -75,6 +67,13 @@ const Home = () => {
       </Grid>
     </>
   );
+};
+
+Home.getInitialProps = async (ctx) => {
+  console.log("headers", ctx.req?.headers);
+  const res = await fetch(`${process.env.BASE_URL}/api/weather-current`);
+  const json: ApiData<typeof weatherCurrentApi> = await res.json();
+  return { weather: json.weather };
 };
 
 export default Home;
