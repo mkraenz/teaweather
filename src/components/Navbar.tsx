@@ -3,6 +3,8 @@ import {
   ChevronRightIcon,
   CloseIcon,
   HamburgerIcon,
+  MoonIcon,
+  SunIcon,
 } from "@chakra-ui/icons";
 import {
   Box,
@@ -18,11 +20,13 @@ import {
   Stack,
   Text,
   useBreakpointValue,
+  useColorMode,
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
+import { FC } from "react";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
@@ -76,6 +80,7 @@ export default function WithSubnavigation() {
           direction={"row"}
           spacing={6}
         >
+          <ColorModeIconButton />
           <Button
             as={"a"}
             fontSize={"sm"}
@@ -268,6 +273,21 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         </Stack>
       </Collapse>
     </Stack>
+  );
+};
+
+const ColorModeIconButton: FC = () => {
+  const { toggleColorMode, colorMode } = useColorMode();
+
+  return (
+    <IconButton
+      size="lg"
+      variant="ghost"
+      color={useColorModeValue("gray.500", "gray.300")}
+      aria-label="open menu"
+      icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+      onClick={toggleColorMode}
+    />
   );
 };
 
