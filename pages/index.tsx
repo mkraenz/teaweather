@@ -1,4 +1,11 @@
-import { Grid, GridItem, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Grid,
+  GridItem,
+  HStack,
+  Text,
+  useColorModeValue,
+  VStack,
+} from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { ApiData } from "../src/api/types";
@@ -16,6 +23,9 @@ interface Props {
 }
 
 const Home: NextPage<Props> = ({ weather }) => {
+  const bgGradientTo = useColorModeValue("cyan-200", "cyan-900");
+  const bgGradientFrom = useColorModeValue("white", "blue-900");
+
   return (
     <>
       <Head>
@@ -27,7 +37,7 @@ const Home: NextPage<Props> = ({ weather }) => {
         minH="100vh"
         minW="100vw"
         // TODO dark mode
-        bg={"linear-gradient(0deg, white 0%, #99eeff 100%);"}
+        bg={`linear-gradient(0deg, var(--chakra-colors-${bgGradientFrom}) 0%, var(--chakra-colors-${bgGradientTo}) 100%);`}
         templateAreas={`
           "navbar"
           "main"
@@ -48,7 +58,10 @@ const Home: NextPage<Props> = ({ weather }) => {
             <Heading1 text="TeaWeather" />
             <Heading2 text="Find the perfect weather for your afternoon tea." />
             <HStack gap="20px" alignItems={"flex-start"}>
-              <WeatherIcon weather={weather.description} />
+              <WeatherIcon
+                typeId={weather.weatherTypeId}
+                description={weather.description}
+              />
               <WeatherDetails {...weather} />
               <VStack alignItems={"flex-end"}>
                 <Text as="h3" fontSize={"2xl"}>
@@ -70,7 +83,6 @@ const Home: NextPage<Props> = ({ weather }) => {
 };
 
 Home.getInitialProps = async (ctx) => {
-  console.log("headers", ctx.req?.headers);
   const res = await fetch(`${process.env.BASE_URL}/api/weather-current`);
   const json: ApiData<typeof weatherCurrentApi> = await res.json();
   return { weather: json.weather };

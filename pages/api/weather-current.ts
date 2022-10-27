@@ -28,6 +28,7 @@ const windDegreesToDirection = (degrees: number): string => {
   return "N";
 };
 
+/** Retrieves weather from https://openweathermap.org/forecast5 */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -38,7 +39,10 @@ export default async function handler(
   // defailt to Westminster, London, UK
   const url = new URL("https://api.openweathermap.org/data/2.5/forecast");
   url.searchParams.append("lat", "51.5072");
-  url.searchParams.append("lon", "-0.11");
+  url.searchParams.append("lon", "0.0");
+
+  // url.searchParams.append("lat", "34.6937");
+  // url.searchParams.append("lon", "135.5023");
   url.searchParams.append("appId", openWeatherApiKey);
   const apiRes = await fetch(url.toString());
   if (!apiRes.ok) {
@@ -46,36 +50,38 @@ export default async function handler(
   }
   const json: OpenWeatherForecast = await apiRes.json();
 
-  const data: WeatherData = {
-    location: "London, UK",
-    time: "Wednesday, 14:00",
-    description: "Mostly sunny",
-    temperature: 20,
-    temperatureUnit: "°C",
-    humidity: 50,
-    humidityUnit: "%",
-    pressure: 1000,
-    pressureUnit: "hPa",
-    wind: 10,
-    windUnit: "km/h",
-    windDirection: "N",
-    precipitationProbabilityInPercent: 10,
-  };
+  // const data: WeatherData = {
+  //   location: "London, UK",
+  //   time: "Wednesday, 14:00",
+  //   description: "Mostly sunny",
+  //   weatherTypeId: 800,
+  //   temperature: 20,
+  //   temperatureUnit: "°C",
+  //   humidity: 50,
+  //   humidityUnit: "%",
+  //   pressure: 1000,
+  //   pressureUnit: "hPa",
+  //   wind: 10,
+  //   windUnit: "km/h",
+  //   windDirection: "N",
+  //   precipitationProbabilityInPercent: 10,
+  // };
   const entry = json.list[0];
   const weather: WeatherData = {
     location: `${json.city.name}, ${json.city.country}`,
     time: new Date(entry.dt * 1000).toLocaleString(),
     temperature: Math.round(entry.main.temp - 273.15), // Kelvin to Celsius
     description: entry.weather[0].description,
+    weatherTypeId: entry.weather[0].id,
     temperatureUnit: "°C",
-    humidity: entry.main.humidity,
+    humidity: Math.round(entry.main.humidity),
     humidityUnit: "%",
     pressure: entry.main.pressure,
     pressureUnit: "hPa",
     wind: entry.wind.speed,
     windUnit: "m/s",
     windDirection: windDegreesToDirection(entry.wind.deg),
-    precipitationProbabilityInPercent: entry.pop * 100,
+    precipitationProbabilityInPercent: Math.round(entry.pop * 100),
   };
 
   // TODO include https://openweathermap.org/api

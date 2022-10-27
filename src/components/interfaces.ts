@@ -2,6 +2,7 @@ export interface WeatherData {
   location: string;
   time: string;
   description: string;
+  weatherTypeId: number; // IDs as in https://openweathermap.org/weather-conditions
   temperature: number;
   temperatureUnit: string;
   humidity: number;
