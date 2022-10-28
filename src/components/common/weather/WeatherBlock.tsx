@@ -23,7 +23,12 @@ const WeatherBlock: FC<Props> = ({ weather, withLocation }) => {
             {weather.location}
           </Text>
         )}
-        <Text>{weather.time}</Text>
+        <Text>
+          {new Date(weather.time).toLocaleString("en-US", {
+            dateStyle: "short",
+            timeStyle: "short",
+          })}
+        </Text>
         <Text fontSize={"lg"}>{weather.description}</Text>
       </VStack>
     </HStack>

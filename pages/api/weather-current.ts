@@ -93,7 +93,6 @@ export default async function handler(
   const entry = json.list[0];
   const weather: WeatherData = {
     location: `${json.city.name}, ${json.city.country}`,
-    // TODO fix timezone issue. use client's timezone
     time: new Date(entry.dt * 1000).toISOString(),
     temperature: Math.round(entry.main.temp - 273.15), // Kelvin to Celsius
     description: entry.weather[0].description,
