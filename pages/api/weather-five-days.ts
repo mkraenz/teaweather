@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import getLocation from "../../src/api/get-location";
 import { OpenWeatherForecast } from "../../src/api/openweathermap.interface";
 import { WeatherData } from "../../src/components/interfaces";
 
@@ -39,11 +40,25 @@ export default async function handler(
   const openWeatherApiKey = process.env.OPENWEATHERMAP_API_KEY;
   if (!openWeatherApiKey)
     throw new Error("Missing env var OPENWEATHERMAP_API_KEY");
-  const url = new URL("https://api.openweathermap.org/data/2.5/forecast");
 
-  url.searchParams.set("lat", "34.6937");
-  url.searchParams.set("lon", "135.5023");
+  const lat = req.query["lat"];
+  const lon = req.query["lon"];
+
+  let location: { longitude: number; latitude: number };
+
+  if (lat && lon && typeof lat === "string" && typeof lon === "string") {
+    location = { longitude: parseFloat(lon), latitude: parseFloat(lat) };
+  } else {
+    const city = req.query["city"];
+    const country = req.query["countryCode"];
+    location = await getLocation(openWeatherApiKey, city, country);
+  }
+
+  const url = new URL("https://api.openweathermap.org/data/2.5/forecast");
+  url.searchParams.set("lat", location.latitude.toString());
+  url.searchParams.set("lon", location.longitude.toString());
   url.searchParams.set("appId", openWeatherApiKey);
+
   const apiRes = await fetch(url.toString());
   if (!apiRes.ok) {
     // TODO handle error

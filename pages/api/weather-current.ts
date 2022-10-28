@@ -1,9 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import {
-  OpenWeatherForecast,
-  OpenWeatherLocation,
-} from "../../src/api/openweathermap.interface";
+import getLocation from "../../src/api/get-location";
+import { OpenWeatherForecast } from "../../src/api/openweathermap.interface";
 import { WeatherData } from "../../src/components/interfaces";
 
 type Data = {
@@ -31,11 +29,6 @@ const windDegreesToDirection = (degrees: number): string => {
   return "N";
 };
 
-const Berlin = { longitude: 13.3888599, latitude: 52.5170365 };
-const locationsCache: Map<string, { longitude: number; latitude: number }> =
-  new Map();
-locationsCache.set("berlin", Berlin);
-
 /** Retrieves weather from https://openweathermap.org/forecast5.
  * Default location is Berlin, Berlin, DE
  */
@@ -43,7 +36,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  console.log(locationsCache.size);
   const openWeatherApiKey = process.env.OPENWEATHERMAP_API_KEY;
   if (!openWeatherApiKey)
     throw new Error("Missing env var OPENWEATHERMAP_API_KEY");
@@ -108,35 +100,3 @@ export default async function handler(
   // TODO add login https://auth0.com/docs/quickstart/webapp/nextjs/01-login
   res.status(200).json({ weather });
 }
-
-/** default location: Berlin, Berlin, DE
- * TODO consider using https://simplemaps.com/data/world-cities
- */
-const getLocation = async (
-  openWeatherApiKey: string,
-  rawCity: string | string[] | undefined,
-  countryCode: string | string[] | undefined = "de"
-): Promise<{ longitude: number; latitude: number }> => {
-  if (!rawCity || typeof rawCity !== "string") return Berlin;
-  const city = rawCity.toLowerCase().trim();
-  if (!city) return Berlin;
-  if (locationsCache.has(city)) return locationsCache.get(city)!;
-
-  // see https://openweathermap.org/api/geocoding-api
-  const url = new URL("http://api.openweathermap.org/geo/1.0/direct");
-  url.searchParams.set("q", `${city},${countryCode}`);
-  url.searchParams.set("limit", "5");
-  url.searchParams.set("appId", openWeatherApiKey);
-
-  const locationRes = await fetch(url.toString());
-  if (!locationRes.ok) {
-    // TODO handle error
-  }
-  const json: OpenWeatherLocation[] = await locationRes.json();
-  const bestMatch = json[0];
-  if (!bestMatch) return Berlin; // TODO maybe notify client that location was not found
-
-  const location = { longitude: bestMatch.lon, latitude: bestMatch.lat };
-  locationsCache.set(city, location);
-  return location;
-};

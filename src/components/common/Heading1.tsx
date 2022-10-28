@@ -3,9 +3,10 @@ import { FC } from "react";
 
 interface Props {
   text: string;
+  textTransform?: "uppercase" | "lowercase" | "capitalize" | "none";
 }
 
-const Heading1: FC<Props> = ({ text }) => {
+const Heading1: FC<Props> = ({ text, textTransform }) => {
   return (
     <Heading
       as="h1"
@@ -13,6 +14,7 @@ const Heading1: FC<Props> = ({ text }) => {
       noOfLines={1}
       color={useColorModeValue("gray.700", "white")}
       overflow="overflow"
+      textTransform={textTransform}
     >
       {text}
     </Heading>

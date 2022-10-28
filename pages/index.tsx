@@ -13,12 +13,12 @@ import type { NextPage } from "next";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { URL } from "url";
 import { ApiData } from "../src/api/types";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
+import { getLocationUrl } from "../src/components/get-location-url";
 import { WeatherData } from "../src/components/interfaces";
 import type weatherCurrentApi from "./api/weather-current";
 
@@ -175,7 +175,7 @@ export const getServerSideProps: GetServerSideProps<
   const baseUrl = process.env.BASE_URL ?? ""; // when this is executed on server, env var is defined. But when executed on client, env var is undefined. With fallback, we ensure a relative api call from the client
   const cookies = context.req?.headers.cookie ?? "";
 
-  const url = getLocationUrl(cookies, baseUrl);
+  const url = getLocationUrl(cookies, baseUrl, "/weather-current");
   const res = await fetch(url.toString());
   const json: ApiData<typeof weatherCurrentApi> = await res.json();
 
@@ -187,39 +187,6 @@ export const getServerSideProps: GetServerSideProps<
       weather: json.weather,
     },
   };
-};
-
-const getLocationUrl = (cookies: string, baseUrl: string) => {
-  const locationCookieValue = cookies
-    .split("teaweather-location=")[1]
-    ?.split(";")[0];
-  const defaultUrl = new URL(`${baseUrl}/api/weather-current`);
-  defaultUrl.searchParams.set("city", "Berlin");
-  defaultUrl.searchParams.set("countryCode", "de");
-
-  if (!locationCookieValue) return defaultUrl;
-
-  try {
-    const parsedLocation = JSON.parse(locationCookieValue);
-    if (
-      typeof parsedLocation.lat !== "number" &&
-      typeof parsedLocation.lon !== "number"
-    ) {
-      throw new Error(
-        "Invalid location cookie value. Somebody tried to hack us!"
-      );
-    }
-
-    const locationBasedUrl = new URL(`${baseUrl}/api/weather-current`);
-    locationBasedUrl.searchParams.set("lat", parsedLocation.lat.toString());
-    locationBasedUrl.searchParams.set("lon", parsedLocation.lon.toString());
-    return locationBasedUrl;
-  } catch (error) {
-    console.error("Invalid location cookie value", locationCookieValue);
-    console.error(error);
-    // log the attempt and fallback to default location
-    return defaultUrl;
-  }
 };
 
 export default Home;
