@@ -4,7 +4,7 @@ import { OpenWeatherForecast } from "../../src/api/openweathermap.interface";
 import { WeatherData } from "../../src/components/interfaces";
 
 type Data = {
-  weather: WeatherData;
+  weathers: WeatherData[];
 };
 
 const windDegreesToDirection = (degrees: number): string => {
@@ -38,11 +38,11 @@ export default async function handler(
     throw new Error("Missing env var OPENWEATHERMAP_API_KEY");
   // defailt to Westminster, London, UK
   const url = new URL("https://api.openweathermap.org/data/2.5/forecast");
-  url.searchParams.append("lat", "51.5072");
-  url.searchParams.append("lon", "0.0");
+  // url.searchParams.append("lat", "51.5072");
+  // url.searchParams.append("lon", "0.0");
 
-  // url.searchParams.append("lat", "34.6937");
-  // url.searchParams.append("lon", "135.5023");
+  url.searchParams.append("lat", "34.6937");
+  url.searchParams.append("lon", "135.5023");
   url.searchParams.append("appId", openWeatherApiKey);
   const apiRes = await fetch(url.toString());
   if (!apiRes.ok) {
@@ -66,8 +66,7 @@ export default async function handler(
   //   windDirection: "N",
   //   precipitationProbabilityInPercent: 10,
   // };
-  const entry = json.list[0];
-  const weather: WeatherData = {
+  const weathers: WeatherData[] = json.list.map((entry) => ({
     location: `${json.city.name}, ${json.city.country}`,
     time: new Date(entry.dt * 1000).toLocaleString(),
     temperature: Math.round(entry.main.temp - 273.15), // Kelvin to Celsius
@@ -82,8 +81,7 @@ export default async function handler(
     windUnit: "m/s",
     windDirection: windDegreesToDirection(entry.wind.deg),
     precipitationProbabilityInPercent: Math.round(entry.pop * 100),
-  };
+  }));
 
-  // TODO add login https://auth0.com/docs/quickstart/webapp/nextjs/01-login
-  res.status(200).json({ weather });
+  res.status(200).json({ weathers });
 }

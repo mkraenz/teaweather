@@ -22,7 +22,7 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
         <Navbar />
       </GridItem>
 
-      <GridItem area="main" as="main">
+      <GridItem area="main" as="main" mb={16}>
         {children}
       </GridItem>
 

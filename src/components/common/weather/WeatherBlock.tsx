@@ -6,7 +6,7 @@ import WeatherIcon from "./WeatherIcon";
 
 interface Props {
   weather: WeatherData;
-  withLocation?: true;
+  withLocation?: boolean;
 }
 
 const WeatherBlock: FC<Props> = ({ weather, withLocation }) => {

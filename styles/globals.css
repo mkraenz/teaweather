@@ -24,3 +24,7 @@ a {
     background: black;
   }
 }
+/* debug boxes
+* {
+  outline: 1px solid red !important;
+} */
