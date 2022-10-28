@@ -1,7 +1,8 @@
-import { VStack } from "@chakra-ui/react";
+import { Button, Input, VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { useState } from "react";
 import { ApiData } from "../src/api/types";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
@@ -14,7 +15,18 @@ interface Props {
   weather: WeatherData;
 }
 
-const Home: NextPage<Props> = ({ weather }) => {
+const Home: NextPage<Props> = (props) => {
+  const [weather, setWeather] = useState(props.weather);
+  const [location, setLocation] = useState("");
+  const handleLocationApplied = async () => {
+    const res = await fetch(`/api/weather-current?city=${location}`);
+    if (!res.ok) {
+      // TODO handle error
+    }
+    const data: ApiData<typeof weatherCurrentApi> = await res.json();
+    setWeather(data.weather);
+  };
+
   return (
     <>
       <Head>
@@ -30,6 +42,14 @@ const Home: NextPage<Props> = ({ weather }) => {
         <Heading1 text="TeaWeather" />
         <Heading2 text="Find the perfect weather for your afternoon tea." />
         <WeatherBlock weather={weather} withLocation />
+        <Input
+          placeholder="Your city"
+          size="md"
+          type="search"
+          maxW={300}
+          onChange={(e) => setLocation(e.currentTarget.value)}
+        />
+        <Button onClick={handleLocationApplied}>Apply</Button>
       </VStack>
     </>
   );
