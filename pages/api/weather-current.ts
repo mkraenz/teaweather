@@ -62,12 +62,9 @@ export default async function handler(
   }
 
   const url = new URL("https://api.openweathermap.org/data/2.5/forecast");
-  url.searchParams.append("lat", location.latitude.toString());
-  url.searchParams.append("lon", location.longitude.toString());
-
-  // url.searchParams.append("lat", "34.6937");
-  // url.searchParams.append("lon", "135.5023");
-  url.searchParams.append("appId", openWeatherApiKey);
+  url.searchParams.set("lat", location.latitude.toString());
+  url.searchParams.set("lon", location.longitude.toString());
+  url.searchParams.set("appId", openWeatherApiKey);
   const apiRes = await fetch(url.toString());
   if (!apiRes.ok) {
     // TODO handle error
@@ -127,9 +124,9 @@ const getLocation = async (
 
   // see https://openweathermap.org/api/geocoding-api
   const url = new URL("http://api.openweathermap.org/geo/1.0/direct");
-  url.searchParams.append("q", `${city},${countryCode}`);
-  url.searchParams.append("limit", "5");
-  url.searchParams.append("appId", openWeatherApiKey);
+  url.searchParams.set("q", `${city},${countryCode}`);
+  url.searchParams.set("limit", "5");
+  url.searchParams.set("appId", openWeatherApiKey);
 
   const locationRes = await fetch(url.toString());
   if (!locationRes.ok) {

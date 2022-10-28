@@ -39,14 +39,11 @@ export default async function handler(
   const openWeatherApiKey = process.env.OPENWEATHERMAP_API_KEY;
   if (!openWeatherApiKey)
     throw new Error("Missing env var OPENWEATHERMAP_API_KEY");
-  // defailt to Westminster, London, UK
   const url = new URL("https://api.openweathermap.org/data/2.5/forecast");
-  // url.searchParams.append("lat", "51.5072");
-  // url.searchParams.append("lon", "0.0");
 
-  url.searchParams.append("lat", "34.6937");
-  url.searchParams.append("lon", "135.5023");
-  url.searchParams.append("appId", openWeatherApiKey);
+  url.searchParams.set("lat", "34.6937");
+  url.searchParams.set("lon", "135.5023");
+  url.searchParams.set("appId", openWeatherApiKey);
   const apiRes = await fetch(url.toString());
   if (!apiRes.ok) {
     // TODO handle error
