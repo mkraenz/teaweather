@@ -12,6 +12,7 @@ const Heading1: FC<Props> = ({ text }) => {
       size="4xl"
       noOfLines={1}
       color={useColorModeValue("gray.700", "white")}
+      overflow="overflow"
     >
       {text}
     </Heading>
