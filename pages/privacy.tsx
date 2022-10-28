@@ -1,6 +1,7 @@
 import { Text, VStack } from "@chakra-ui/react";
 import Head from "next/head";
 import Heading1 from "../src/components/common/Heading1";
+import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 
 const PrivacyPolicy = () => {
   return (
@@ -40,5 +41,7 @@ const PrivacyPolicy = () => {
     </>
   );
 };
+
+export const getServerSideProps = colorWorkaroundGetServerSideProps;
 
 export default PrivacyPolicy;

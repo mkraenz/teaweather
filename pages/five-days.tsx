@@ -1,24 +1,26 @@
 import { VStack } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { ApiData } from "../src/api/types";
 import Heading2 from "../src/components/common/Heading2";
+import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { WeatherData } from "../src/components/interfaces";
-import type weatherCurrentApi from "./api/weather-current";
+import weatherFiveDays from "./api/weather-five-days";
 
 interface Props {
-  weather: WeatherData;
+  weathers: WeatherData[];
 }
 
-const FiveDays: NextPage<Props> = ({ weather }) => {
+// TODO fix horizontal scrollbar
+const FiveDays: NextPage<Props> = ({ weathers }) => {
   return (
     <>
       <Head>
         <title>TeaWeather - Five Day Forecast</title>
         <meta
           name="description"
-          content="Weather forecast in steps of five days on TeaWeather"
+          content="Weather forecast for the next five days in steps of three hours on TeaWeather"
         />
       </Head>
 
@@ -27,24 +29,34 @@ const FiveDays: NextPage<Props> = ({ weather }) => {
         gap="var(--chakra-space-16) !important"
         pt={16}
       >
-        <Heading2 text="Five Days" />
+        <Heading2 text="Three Hour Forecast" />
         <VStack gap="var(--chakra-space-4) !important">
-          <WeatherBlock weather={weather} withLocation />
-          <WeatherBlock weather={weather} />
-          <WeatherBlock weather={weather} />
-          <WeatherBlock weather={weather} />
-          <WeatherBlock weather={weather} />
+          {weathers.map((w, i) => (
+            <WeatherBlock key={w.time} weather={w} withLocation={i === 0} />
+          ))}
         </VStack>
       </VStack>
     </>
   );
 };
 
-FiveDays.getInitialProps = async (ctx) => {
-  const baseUrl = process.env.BASE_URL ?? ""; // when this is executed on server, env var is defined. But when executed on client, env var is undefined. With fallback, we ensure a relative api call from the client
-  const res = await fetch(`${baseUrl}/api/weather-current`);
-  const json: ApiData<typeof weatherCurrentApi> = await res.json();
-  return { weather: json.weather };
+export const getServerSideProps: GetServerSideProps<
+  {
+    cookies: string;
+  } & Props
+> = async (context) => {
+  const baseUrl = process.env.BASE_URL ?? "";
+  const res = await fetch(`${baseUrl}/api/weather-five-days`);
+  const json: ApiData<typeof weatherFiveDays> = await res.json();
+
+  const workaround = await colorWorkaroundGetServerSideProps(context);
+
+  return {
+    props: {
+      cookies: workaround.props.cookies,
+      weathers: json.weathers,
+    },
+  };
 };
 
 export default FiveDays;

@@ -73,3 +73,15 @@ interface Main {
   humidity: number;
   temp_kf: number;
 }
+
+export interface OpenWeatherLocation {
+  name: string;
+  local_names: Localnames;
+  lat: number;
+  lon: number;
+  country: string;
+  state: string;
+}
+
+type CountryCode = string; // examples: en, de, ru, mi, na, zh, ja
+type Localnames = Record<CountryCode, string>;

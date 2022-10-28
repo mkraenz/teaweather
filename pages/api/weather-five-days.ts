@@ -28,7 +28,10 @@ const windDegreesToDirection = (degrees: number): string => {
   return "N";
 };
 
-/** Retrieves weather from https://openweathermap.org/forecast5 */
+/**
+ * Retrieves the weather for the next 5 days in 3 hour steps.
+ * Retrieves weather from https://openweathermap.org/forecast5.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -50,22 +53,6 @@ export default async function handler(
   }
   const json: OpenWeatherForecast = await apiRes.json();
 
-  // const data: WeatherData = {
-  //   location: "London, UK",
-  //   time: "Wednesday, 14:00",
-  //   description: "Mostly sunny",
-  //   weatherTypeId: 800,
-  //   temperature: 20,
-  //   temperatureUnit: "°C",
-  //   humidity: 50,
-  //   humidityUnit: "%",
-  //   pressure: 1000,
-  //   pressureUnit: "hPa",
-  //   wind: 10,
-  //   windUnit: "km/h",
-  //   windDirection: "N",
-  //   precipitationProbabilityInPercent: 10,
-  // };
   const weathers: WeatherData[] = json.list.map((entry) => ({
     location: `${json.city.name}, ${json.city.country}`,
     time: new Date(entry.dt * 1000).toLocaleString(),

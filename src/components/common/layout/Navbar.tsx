@@ -306,10 +306,6 @@ const NAV_ITEMS: Array<NavItem> = [
     href: "/",
   },
   {
-    label: "3 Hours",
-    href: "/three-hours",
-  },
-  {
     label: "5 Days",
     href: "/five-days",
   },

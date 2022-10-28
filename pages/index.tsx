@@ -1,9 +1,11 @@
 import { VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { ApiData } from "../src/api/types";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
+import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { WeatherData } from "../src/components/interfaces";
 import type weatherCurrentApi from "./api/weather-current";
@@ -33,11 +35,23 @@ const Home: NextPage<Props> = ({ weather }) => {
   );
 };
 
-Home.getInitialProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps<
+  {
+    cookies: string;
+  } & Props
+> = async (context) => {
   const baseUrl = process.env.BASE_URL ?? ""; // when this is executed on server, env var is defined. But when executed on client, env var is undefined. With fallback, we ensure a relative api call from the client
-  const res = await fetch(`${baseUrl}/api/weather-current`);
+  const res = await fetch(`${baseUrl}/api/weather-current?city=Berlin`);
   const json: ApiData<typeof weatherCurrentApi> = await res.json();
-  return { weather: json.weather };
+
+  const workaround = await colorWorkaroundGetServerSideProps(context);
+
+  return {
+    props: {
+      cookies: workaround.props.cookies,
+      weather: json.weather,
+    },
+  };
 };
 
 export default Home;
