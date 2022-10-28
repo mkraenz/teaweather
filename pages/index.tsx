@@ -100,7 +100,10 @@ const Home: NextPage<Props> = (props) => {
     <>
       <Head>
         <title>TeaWeather - Home</title>
-        <meta name="description" content="Homepage of TeaWeather" />
+        <meta
+          name="description"
+          content="Find the perfect weather for your afternoon tea."
+        />
       </Head>
 
       <VStack
