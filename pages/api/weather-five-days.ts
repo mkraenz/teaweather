@@ -55,7 +55,7 @@ export default async function handler(
 
   const weathers: WeatherData[] = json.list.map((entry) => ({
     location: `${json.city.name}, ${json.city.country}`,
-    time: new Date(entry.dt * 1000).toLocaleString(),
+    time: new Date(entry.dt * 1000).toISOString(),
     temperature: Math.round(entry.main.temp - 273.15), // Kelvin to Celsius
     description: entry.weather[0].description,
     weatherTypeId: entry.weather[0].id,

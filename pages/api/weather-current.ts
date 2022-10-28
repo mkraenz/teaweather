@@ -93,7 +93,8 @@ export default async function handler(
   const entry = json.list[0];
   const weather: WeatherData = {
     location: `${json.city.name}, ${json.city.country}`,
-    time: new Date(entry.dt * 1000).toLocaleString(),
+    // TODO fix timezone issue. use client's timezone
+    time: new Date(entry.dt * 1000).toISOString(),
     temperature: Math.round(entry.main.temp - 273.15), // Kelvin to Celsius
     description: entry.weather[0].description,
     weatherTypeId: entry.weather[0].id,
@@ -112,7 +113,9 @@ export default async function handler(
   res.status(200).json({ weather });
 }
 
-/** default location: Berlin, Berlin, DE */
+/** default location: Berlin, Berlin, DE
+ * TODO consider using https://simplemaps.com/data/world-cities
+ */
 const getLocation = async (
   openWeatherApiKey: string,
   rawCity: string | string[] | undefined,
