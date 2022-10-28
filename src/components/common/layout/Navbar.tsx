@@ -82,7 +82,7 @@ export default function WithSubnavigation() {
         >
           <ColorModeIconButton />
           <Button
-            as={"a"}
+            as={NextLink}
             fontSize={"sm"}
             fontWeight={600}
             variant={"link"}
@@ -91,7 +91,7 @@ export default function WithSubnavigation() {
             Sign In
           </Button>
           <Button
-            as="a"
+            as={NextLink}
             display={{ base: "none", md: "inline-flex" }}
             fontSize={"sm"}
             fontWeight={600}
@@ -131,6 +131,7 @@ const DesktopNav = () => {
           <Popover trigger={"hover"} placement={"bottom-start"}>
             <PopoverTrigger>
               <Link
+                as={NextLink}
                 p={2}
                 href={navItem.href ?? "#"}
                 fontSize={"sm"}
@@ -175,6 +176,7 @@ const DesktopNav = () => {
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   return (
     <Link
+      as={NextLink}
       href={href}
       role={"group"}
       display={"block"}
@@ -230,7 +232,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
     <Stack spacing={4} onClick={children && onToggle}>
       <Flex
         py={2}
-        as={Link}
+        as={Link} // TODO how to use as={NextLink} here?
         href={href ?? "#"}
         justify={"space-between"}
         align={"center"}
@@ -266,7 +268,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         >
           {children &&
             children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
+              <Link key={child.label} py={2} href={child.href} as={NextLink}>
                 {child.label}
               </Link>
             ))}
