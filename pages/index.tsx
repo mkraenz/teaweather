@@ -1,14 +1,4 @@
-import { SearchIcon } from "@chakra-ui/icons";
-import {
-  FormControl,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
-  useColorModeValue,
-  VStack,
-} from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
@@ -17,6 +7,7 @@ import { ApiData } from "../src/api/types";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
+import SearchByCity from "../src/components/common/SearchByCity";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
 import { WeatherData } from "../src/components/interfaces";
@@ -27,14 +18,12 @@ interface Props {
 }
 
 const Home: NextPage<Props> = (props) => {
-  const searchInputTextColor = useColorModeValue("gray.600", "gray.300");
-  const searchButtonColor = useColorModeValue("cyan.300", "blue.700");
-  const searchButtonHoverColor = useColorModeValue("cyan.200", "blue.800");
   const [weather, setWeather] = useState(props.weather);
   const [locationSearch, setLocationSearch] = useState("");
   const handleLocationApplied = async () => {
-    const city = locationSearch.split(",")[0];
-    const country = locationSearch.split(", ")[1] || "de";
+    if (!locationSearch) return;
+    const city = encodeURIComponent(locationSearch.split(",")[0]);
+    const country = encodeURIComponent(locationSearch.split(", ")[1] || "de");
     const res = await fetch(
       `/api/weather-current?city=${city}&countryCode=${country}`
     );
@@ -122,46 +111,10 @@ const Home: NextPage<Props> = (props) => {
         <Heading1 text="TeaWeather" />
         <Heading2 text="Find the perfect weather for your afternoon tea." />
         <WeatherBlock weather={weather} withLocation />
-        <FormControl
-          maxW={{
-            base: "full",
-            md: 360,
-          }}
-          px={4}
-        >
-          <FormLabel
-            htmlFor="search"
-            fontWeight={"normal"}
-            color={searchInputTextColor}
-          >
-            Search by City and Country
-          </FormLabel>
-          <InputGroup size="md">
-            <Input
-              placeholder="Example: Tokyo, jp"
-              variant="filled"
-              // size="md"
-              bg="whiteAlpha.200"
-              color={searchInputTextColor}
-              pr="4.5rem"
-              type={"search"}
-              onChange={(e) => setLocationSearch(e.currentTarget.value)}
-            />
-            <InputRightElement>
-              <IconButton
-                size="md"
-                aria-label="Search"
-                onClick={handleLocationApplied}
-                icon={<SearchIcon />}
-                color={searchInputTextColor}
-                _hover={{
-                  bg: searchButtonHoverColor,
-                }}
-                bg={searchButtonColor}
-              ></IconButton>
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
+        <SearchByCity
+          onInput={setLocationSearch}
+          onSearch={handleLocationApplied}
+        />
       </VStack>
     </>
   );
