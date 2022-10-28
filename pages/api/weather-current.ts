@@ -48,9 +48,18 @@ export default async function handler(
   if (!openWeatherApiKey)
     throw new Error("Missing env var OPENWEATHERMAP_API_KEY");
 
-  const city = req.query["city"];
-  const country = req.query["countryCode"];
-  const location = await getLocation(openWeatherApiKey, city, country);
+  const lat = req.query["lat"];
+  const lon = req.query["lon"];
+
+  let location: { longitude: number; latitude: number };
+
+  if (lat && lon && typeof lat === "string" && typeof lon === "string") {
+    location = { longitude: parseFloat(lon), latitude: parseFloat(lat) };
+  } else {
+    const city = req.query["city"];
+    const country = req.query["countryCode"];
+    location = await getLocation(openWeatherApiKey, city, country);
+  }
 
   const url = new URL("https://api.openweathermap.org/data/2.5/forecast");
   url.searchParams.append("lat", location.latitude.toString());
