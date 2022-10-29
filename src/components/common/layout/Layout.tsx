@@ -1,11 +1,17 @@
 import { Grid, GridItem, useColorModeValue } from "@chakra-ui/react";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   const bgGradientTo = useColorModeValue("cyan-200", "cyan-900");
   const bgGradientFrom = useColorModeValue("white", "blue-900");
+
+  useEffect(() => {
+    const gitsha = process.env.NEXT_PUBLIC_GIT_SHA;
+    console.log("version: ", gitsha);
+  }, []);
+
   return (
     <Grid
       minH="100vh"
