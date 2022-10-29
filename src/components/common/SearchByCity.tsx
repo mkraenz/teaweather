@@ -8,7 +8,7 @@ import {
   InputRightElement,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { FC } from "react";
+import { FC, KeyboardEventHandler } from "react";
 
 interface Props {
   onInput: (value: string) => void;
@@ -19,6 +19,12 @@ const SearchByCity: FC<Props> = ({ onInput, onSearch }) => {
   const searchInputTextColor = useColorModeValue("gray.600", "gray.300");
   const searchButtonColor = useColorModeValue("cyan.300", "blue.700");
   const searchButtonHoverColor = useColorModeValue("cyan.200", "blue.800");
+
+  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if (event.key === "Enter") {
+      onSearch();
+    }
+  };
 
   return (
     <FormControl
@@ -44,6 +50,7 @@ const SearchByCity: FC<Props> = ({ onInput, onSearch }) => {
           pr="4.5rem"
           type={"search"}
           onChange={(e) => onInput(e.currentTarget.value)}
+          onKeyDown={handleKeyDown}
         />
         <InputRightElement>
           <IconButton
