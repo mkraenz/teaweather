@@ -39,7 +39,6 @@ const Home: NextPage<Props> = (props) => {
     ApiData<typeof weatherCurrentApi>
   >((lat, lon) => `/api/weather-current?lat=${lat}&lon=${lon}`);
   useEffect(() => {
-    console.log("ran useEffect in Home", data);
     if (data) setWeather(data?.weather);
   }, [data]);
 

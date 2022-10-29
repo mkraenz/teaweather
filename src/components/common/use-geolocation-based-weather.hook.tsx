@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export default function useGeolocationBasedWeather<T>(
-  getUrl: (latitude: number, longitude: string) => string
+  getUrl: (latitude: number, longitude: number) => string
 ) {
   const [fetchResult, setFetchResult] = useState<T | null>(null);
   const [loading, setLoading] = useState(false); // TODO implement
@@ -12,9 +12,7 @@ export default function useGeolocationBasedWeather<T>(
     // based on https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API
 
     const fetchWeather = async (position: { lat: number; lon: number }) => {
-      const res = await fetch(
-        `/api/weather-current?lat=${position.lat}&lon=${position.lon}`
-      );
+      const res = await fetch(getUrl(position.lat, position.lon));
       if (!res.ok) {
         // TODO handle error
       }
