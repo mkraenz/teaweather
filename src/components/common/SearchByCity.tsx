@@ -39,7 +39,6 @@ const SearchByCity: FC<Props> = ({ onInput, onSearch }) => {
         <Input
           placeholder="Example: Tokyo, jp"
           variant="filled"
-          // size="md"
           bg="whiteAlpha.200"
           color={searchInputTextColor}
           pr="4.5rem"
