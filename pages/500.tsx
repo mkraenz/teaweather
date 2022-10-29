@@ -3,7 +3,6 @@ import NextLink from "next/link";
 import { FC } from "react";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
-import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 
 interface Props {}
 
@@ -29,7 +28,5 @@ const Custom500: FC<Props> = (props) => {
     </VStack>
   );
 };
-
-export const getServerSideProps = colorWorkaroundGetServerSideProps;
 
 export default Custom500;
