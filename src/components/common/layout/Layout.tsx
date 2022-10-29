@@ -16,7 +16,7 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       "main"
       "footer"
     `}
-      gridTemplateRows={"70px 1fr 30px"}
+      gridTemplateRows={"fit-content(70px) 1fr fit-content(30px)"}
     >
       <GridItem area="navbar" as="nav">
         <Navbar />
