@@ -8,7 +8,7 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   const bgGradientFrom = useColorModeValue("white", "blue-900");
 
   useEffect(() => {
-    const gitsha = process.env.NEXT_PUBLIC_GIT_SHA;
+    const gitsha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
     console.log("version: ", gitsha);
   }, []);
 
