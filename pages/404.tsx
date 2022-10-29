@@ -2,10 +2,15 @@ import { Button, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { FC } from "react";
 import Heading1 from "../src/components/common/Heading1";
-import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 
 interface Props {}
 
+/**
+ * Bug: Nextjs is bitchy about error 404 using getServerSideProps to fix the dark mode flicker.
+ * Related: https://github.com/i18next/next-i18next/issues/677
+ * Original error message:
+ * Error: `pages/404` can not have getInitialProps/getServerSideProps, https://nextjs.org/docs/messages/404-get-initial-props
+ */
 const Custom404: FC<Props> = (props) => {
   return (
     <VStack justifyContent={"center"} mt={16} gap={16}>
@@ -27,7 +32,5 @@ const Custom404: FC<Props> = (props) => {
     </VStack>
   );
 };
-
-export const getServerSideProps = colorWorkaroundGetServerSideProps;
 
 export default Custom404;
