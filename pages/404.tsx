@@ -2,6 +2,7 @@ import { Button, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { FC } from "react";
 import Heading1 from "../src/components/common/Heading1";
+import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 
 interface Props {}
 
@@ -26,5 +27,7 @@ const Custom404: FC<Props> = (props) => {
     </VStack>
   );
 };
+
+export const getServerSideProps = colorWorkaroundGetServerSideProps;
 
 export default Custom404;
