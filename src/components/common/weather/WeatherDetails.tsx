@@ -27,14 +27,14 @@ const WeatherDetails: FC<Props> = ({
   return (
     <Box>
       <Text>
-        Temperature: {temperature} {temperatureUnit}
+        Temperature: {temperature}&nbsp;{temperatureUnit}
       </Text>
-      <Text>Precipitation: {precipitationProbabilityInPercent} %</Text>
+      <Text>Precipitation: {precipitationProbabilityInPercent}&nbsp;%</Text>
       <Text>
-        Humidity: {humidity} {humidityUnit}
+        Humidity: {humidity}&nbsp;{humidityUnit}
       </Text>
       <Text>
-        Wind: {wind} {windUnit} {windDirection}
+        Wind: {wind}&nbsp;{windUnit}&nbsp;{windDirection}
       </Text>
     </Box>
   );
