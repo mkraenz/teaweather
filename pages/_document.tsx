@@ -10,7 +10,6 @@ export default function Document() {
       </Head>
       <body>
         {/* for chakra ui light/dark mode support with nextjs SSR */}
-        {/* TODO stop flickering via https://github.com/chakra-ui/chakra-ui/issues/6192 and https://github.com/chakra-ui/chakra-ui/issues/6211 */}
         <ColorModeScript
           initialColorMode={theme.config.initialColorMode}
           type="cookie"

@@ -13,7 +13,6 @@ interface Props {
   weathers: WeatherData[];
 }
 
-// TODO fix horizontal scrollbar
 const FiveDays: NextPage<Props> = ({ weathers }) => {
   return (
     <>
