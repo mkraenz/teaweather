@@ -11,7 +11,9 @@ const Heading2: FC<Props> = ({ text, textTransform }) => {
     <Heading
       as="h2"
       size="lg"
-      noOfLines={1}
+      px={4}
+      textAlign={"center"}
+      noOfLines={2}
       color={useColorModeValue("gray.700", "white")}
       textTransform={textTransform}
     >
