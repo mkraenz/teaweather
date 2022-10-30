@@ -1,3 +1,4 @@
+import { useUser } from "@auth0/nextjs-auth0";
 import {
   ChevronDownIcon,
   ChevronRightIcon,
@@ -27,10 +28,12 @@ import {
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FC } from "react";
+import MyAvatar from "./MyAvatar";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
   const router = useRouter();
+  const { user } = useUser();
 
   return (
     <Box minW="100vw">
@@ -81,29 +84,14 @@ export default function WithSubnavigation() {
           spacing={6}
         >
           <ColorModeIconButton />
-          <Button
-            as={NextLink}
-            fontSize={"sm"}
-            fontWeight={600}
-            variant={"link"}
-            href={"#"}
-          >
-            Sign In
-          </Button>
-          <Button
-            as={NextLink}
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"pink.400"}
-            href={"#"}
-            _hover={{
-              bg: "pink.300",
-            }}
-          >
-            Sign Up
-          </Button>
+          {!user ? (
+            <>
+              <SignInButton />
+              <SignUpButton />
+            </>
+          ) : (
+            <MyAvatar />
+          )}
         </Stack>
       </Flex>
 
@@ -275,6 +263,38 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         </Stack>
       </Collapse>
     </Stack>
+  );
+};
+
+const SignUpButton: FC = () => {
+  return (
+    <Button
+      as={NextLink}
+      display={{ base: "none", md: "inline-flex" }}
+      fontSize={"sm"}
+      fontWeight={600}
+      color={"white"}
+      bg={"pink.400"}
+      href={"#"}
+      _hover={{
+        bg: "pink.300",
+      }}
+    >
+      Sign Up
+    </Button>
+  );
+};
+const SignInButton: FC = () => {
+  return (
+    <Button
+      as={NextLink}
+      fontSize={"sm"}
+      fontWeight={600}
+      variant={"link"}
+      href={"/api/auth/login"}
+    >
+      Sign In
+    </Button>
   );
 };
 
