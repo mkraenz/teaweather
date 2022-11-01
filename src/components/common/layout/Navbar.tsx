@@ -275,7 +275,7 @@ const SignUpButton: FC = () => {
       fontWeight={600}
       color={"white"}
       bg={"pink.400"}
-      href={"#"}
+      href={SIGNUP_LINK}
       _hover={{
         bg: "pink.300",
       }}
@@ -291,7 +291,7 @@ const SignInButton: FC = () => {
       fontSize={"sm"}
       fontWeight={600}
       variant={"link"}
-      href={"/api/auth/login"}
+      href={SIGNIN_LINK}
     >
       Sign In
     </Button>
@@ -320,6 +320,8 @@ interface NavItem {
   href?: string;
 }
 
+const SIGNUP_LINK = "/api/auth/signup";
+const SIGNIN_LINK = "/api/auth/login";
 const NAV_ITEMS: Array<NavItem> = [
   {
     label: "Home",
