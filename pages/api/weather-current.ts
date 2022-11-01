@@ -63,22 +63,6 @@ export default async function handler(
   }
   const json: OpenWeatherForecast = await apiRes.json();
 
-  // const data: WeatherData = {
-  //   location: "London, UK",
-  //   time: "Wednesday, 14:00",
-  //   description: "Mostly sunny",
-  //   weatherTypeId: 800,
-  //   temperature: 20,
-  //   temperatureUnit: "°C",
-  //   humidity: 50,
-  //   humidityUnit: "%",
-  //   pressure: 1000,
-  //   pressureUnit: "hPa",
-  //   wind: 10,
-  //   windUnit: "km/h",
-  //   windDirection: "N",
-  //   precipitationProbabilityInPercent: 10,
-  // };
   const entry = json.list[0];
   const weather: WeatherData = {
     location: `${json.city.name}, ${json.city.country}`,
@@ -97,6 +81,5 @@ export default async function handler(
     precipitationProbabilityInPercent: Math.round(entry.pop * 100),
   };
 
-  // TODO add login https://auth0.com/docs/quickstart/webapp/nextjs/01-login
   res.status(200).json({ weather });
 }

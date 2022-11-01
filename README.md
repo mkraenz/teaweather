@@ -33,9 +33,9 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-
 ## Authentication / Authorization
 
-- https://auth0.com/docs/quickstart/webapp/nextjs/01-log (login to Auth0 with regular Google account)
+- [Auth0 with Nextjs official docs](https://auth0.com/docs/quickstart/webapp/nextjs/01-log) (login to Auth0 with regular Google account)
 - tenant: `teaweather`
 - application name: `nextjs`
+- [Protecting nextjs api routes](https://github.com/auth0/nextjs-auth0/blob/main/EXAMPLES.md#protect-an-api-route)
