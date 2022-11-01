@@ -17,7 +17,7 @@ const WeatherBlock: FC<Props> = ({ weather, withLocation }) => {
         description={weather.description}
       />
       <WeatherDetails {...weather} />
-      <VStack alignItems={"flex-end"}>
+      <VStack alignItems={"flex-end"} pr={4}>
         {withLocation && (
           <Text as="h3" fontSize={"2xl"}>
             {weather.location}
