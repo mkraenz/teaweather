@@ -14,11 +14,7 @@ function Profile() {
             className="align-items-center profile-header mb-5 text-center text-md-left"
             data-testid="profile"
           >
-            <MyAvatar
-              avatarSrc={user.picture || ""}
-              userEmail={user.email || ""}
-              username={user.name || user.nickname || "No name"}
-            ></MyAvatar>
+            <MyAvatar />
           </VStack>
           <div data-testid="profile-json">
             <pre>{JSON.stringify(user, null, 2)}</pre>
