@@ -56,6 +56,7 @@ const FiveDays: NextPage<Props> = (props) => {
         pt={16}
       >
         <Heading2
+          as="h1"
           text={`five days forecast for ${
             weathers ? weathers[0]?.location : props.weathers[0].location
           }`}

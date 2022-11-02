@@ -4,12 +4,13 @@ import { FC } from "react";
 interface Props {
   text: string;
   textTransform?: "uppercase" | "lowercase" | "capitalize" | "none";
+  as?: "h1" | "h2";
 }
 
-const Heading2: FC<Props> = ({ text, textTransform }) => {
+const Heading2: FC<Props> = ({ text, textTransform, as = "h2" }) => {
   return (
     <Heading
-      as="h2"
+      as={as}
       size="lg"
       px={4}
       textAlign={"center"}
