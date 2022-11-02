@@ -67,9 +67,7 @@ Resources:
         PassthroughBehavior: WHEN_NO_TEMPLATES
         RequestTemplates:
           # Build the structure of the request that is sent when calling DynamoDB PutItem
-          # Using single-line, stringified JSON as the mapping template
-          # Example body when making API request: {"artist": "The Beatles", "album": "Abbey Road"}
-          # Use the unique id of the API context variable (eg: $context.requestId) as the DynamoDB item id
+          # Example body when making API request: {"userId": "1234", "locations": [{"lat": 1.0, "lon": 2.0}]}
           application/json: !Sub |
             {
               "TableName": "${UsersTable}",
@@ -78,13 +76,14 @@ Resources:
                   "S": "$util.escapeJavaScript($input.path('userId'))"
                 },
                 "locations": {
-                  "S": "$util.escapeJavaScript($input.path('$.locations'))"
+                  "S": "$util.escapeJavaScript($input.json('$.locations'))"
                 }
               }
             }
         IntegrationResponses:
           - StatusCode: "200"
             ResponseTemplates:
+              # DynamoDB does not send a response
               application/json: "{}"
       MethodResponses:
         - StatusCode: "200"
@@ -126,10 +125,18 @@ Resources:
           - StatusCode: "200"
             ResponseTemplates:
               application/json: |
+                #if($input.path('$.Item.id.S') && !$input.path('$.Item.id.S').empty)
+                #set ($locations = $util.parseJson($input.json('$.Item.locations.S')))
+                #set ($id = $input.json('$.Item.id.S'))
                 {
-                  "userId": "$util.escapeJavaScript($input.path('$.Item.id.S'))",
-                  "locations": "$util.escapeJavaScript($input.path('$.Item.locations.S'))"
+                  "userId": $id,                  
+                  "locations": $locations
                 }
+                #else
+                {
+                  "error": "User not found"
+                }
+                #end
       MethodResponses:
         - StatusCode: "200"
 
