@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-}
+  api: {
+    bodyParser: {
+      sizeLimit: "100kb",
+    },
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

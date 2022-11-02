@@ -1,0 +1,196 @@
+# https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/
+# and https://serverlessland.com/patterns/apigw-dynamodb-sls
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation template that defines necessary metadata, creates a dynamodb instance and an api gateway with an api key to allow external access to the dynamodb instance"
+
+Resources:
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}
+      AttributeDefinitions:
+        - AttributeName: id # = user id / oauth sub. We save everything inside a single user column.
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      Tags:
+        - Key: CreatedVia
+          Value: !Sub CloudFormation ${AWS::StackName} template
+
+  Api:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${AWS::StackName}
+      ApiKeySourceType: HEADER
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Tags:
+        - Key: CreatedVia
+          Value: !Sub CloudFormation ${AWS::StackName} template
+
+  UsersApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: users
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - UsersMethodPost
+    Properties:
+      RestApiId: !Ref Api
+      StageName: prod
+
+  UsersMethodPost:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref UsersApiResource
+      HttpMethod: POST
+      ApiKeyRequired: true
+      AuthorizationType: None
+      Integration:
+        Type: AWS
+        Credentials: !GetAtt APIGatewayRole.Arn
+        # Should always be POST when integrating with AWS services
+        IntegrationHttpMethod: POST
+        # More info: https://docs.aws.amazon.com/apigateway/api-reference/resource/integration/
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem"
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          # Build the structure of the request that is sent when calling DynamoDB PutItem
+          # Using single-line, stringified JSON as the mapping template
+          # Example body when making API request: {"artist": "The Beatles", "album": "Abbey Road"}
+          # Use the unique id of the API context variable (eg: $context.requestId) as the DynamoDB item id
+          application/json: !Sub '{"TableName":"${UsersTable}","Item":{"id":{"S":"$input.path(''userId'')"},"locations":{"S":"$input.path(''$.locations'')"}}}'
+        IntegrationResponses:
+          - StatusCode: "200"
+            ResponseTemplates:
+              application/json: "{}"
+      MethodResponses:
+        - StatusCode: "200"
+
+  # TODO
+  # GetUserApiResource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     RestApiId: !Ref Api
+  #     ParentId: !Ref UsersApiResource
+  #     PathPart: /{userId}
+
+  # UsersMethodGet:
+  #   Type: AWS::ApiGateway::Method
+  #   Properties:
+  #     RestApiId: !Ref Api
+  #     ResourceId: !Ref UsersApiResource
+  #     HttpMethod: Get
+  #     AuthorizationType: API_KEY
+  #     Integration:
+  #       Type: AWS
+  #       Credentials: !GetAtt APIGatewayRole.Arn
+  #       # Should always be POST when integrating with AWS services
+  #       IntegrationHttpMethod: POST
+  #       # More info: https://docs.aws.amazon.com/apigateway/api-reference/resource/integration/
+  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/GetItem"
+  #       PassthroughBehavior: WHEN_NO_TEMPLATES
+  #       RequestTemplates:
+  #         application/json: !Sub |
+  #           {
+  #             "TableName": "${UsersTable}",
+  #             "Key": {
+  #               "id": {
+  #                 "S": "$input.params('userId')"
+  #               }
+  #             }
+  #           }
+  #       IntegrationResponses:
+  #         - StatusCode: "200"
+  #           ResponseTemplates:
+  #             application/json: "{}"
+  #     MethodResponses:
+  #       - StatusCode: "200"
+
+  APIGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: APIGatewayDynamoDBPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: CrudDynamodb
+                Effect: Allow
+                Action:
+                  - dynamodb:putItem
+                  - dynamodb:getItem
+                  - dynamodb:updateItem
+                  - dynamodb:deleteItem
+                Resource: !GetAtt UsersTable.Arn
+      Tags:
+        - Key: CreatedVia
+          Value: !Sub CloudFormation ${AWS::StackName} template
+
+  TeaWeatherNextjsToApiGwApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn:
+      - ApiDeployment
+    Properties:
+      Description: Api key for TeaWeather Nextjs application hosted on Vercel
+      Enabled: true
+      Name: !Sub ${AWS::StackName}-apikey
+      StageKeys:
+        - RestApiId: !Ref Api
+          StageName: prod
+      Tags:
+        - Key: CreatedVia
+          Value: !Sub CloudFormation ${AWS::StackName} template
+
+  # needed to use the api key
+  ApiUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+      - ApiDeployment
+    Properties:
+      ApiStages:
+        - ApiId: !Ref Api
+          Stage: prod
+      Throttle:
+        RateLimit: 20
+        BurstLimit: 200
+      UsagePlanName: !Sub ${AWS::StackName}-usage-plan
+      Quota:
+        Limit: 1000
+        Period: MONTH
+
+  ApiUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyType: API_KEY
+      KeyId: !Ref TeaWeatherNextjsToApiGwApiKey
+      UsagePlanId: !Ref ApiUsagePlan
+
+Outputs:
+  ApiKey:
+    Description: "API key for TeaWeather Nextjs application hosted on Vercel"
+    Value: !Ref TeaWeatherNextjsToApiGwApiKey
+  ApiId:
+    Value: !Ref Api
+  ApiUrl:
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
