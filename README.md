@@ -31,12 +31,15 @@ aws cloudformation create-stack --stack-name teaweather --template-body file://c
 aws cloudformation update-stack --stack-name teaweather --template-body file://cloudformation-template.yaml --capabilities CAPABILITY_IAM | jq .StackId
 
 # describe stack
-STACK_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq .Stacks[0].StackId)
+STACK_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq '.Stacks[0].StackId')
 
-# TODO fixme
-API_GATEWAY_KEY_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq .Stacks[0].Outputs[0])
-# TODO fixme
-API_GATEWAY_KEY_VALUE=$(aws apigateway get-api-keys --name-query $API_GATEWAY_KEY_ID --include-values --query 'items[0].value' --output text )
+API_GATEWAY_KEY_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq '.Stacks[0].Outputs' | jq -r ' map(select(.OutputKey == "ApiKey"))[0].OutputValue')
+API_GATEWAY_KEY_VALUE=$(aws apigateway get-api-keys --include-values --query 'items[0].value' --output text )
+# use with care:
+# echo $API_GATEWAY_KEY_VALUE
+
+API_GATEWAY_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq '.Stacks[0].Outputs' | jq -r ' map(select(.OutputKey == "ApiId"))[0].OutputValue')
+aws apigateway create-deployment --rest-api-id $API_GATEWAY_ID --stage-name prod
 ```
 
 ### Delete AWS resources
