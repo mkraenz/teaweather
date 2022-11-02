@@ -166,12 +166,13 @@ Resources:
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/GetItem"
         PassthroughBehavior: WHEN_NO_TEMPLATES
         RequestTemplates:
+          # we need to url decode this since auth0 include chars like pipe in the user's sub, e.g. sub="google-oauth2|11111111111111"
           application/json: !Sub |
             {
               "TableName": "${UsersTable}",
               "Key": {
                 "id": {
-                  "S": "$util.escapeJavaScript($input.params('userId'))"
+                  "S": "$util.escapeJavaScript($util.urlDecode($input.params('userId')))"
                 }
               }
             }
