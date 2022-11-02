@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
+import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDatabaseUser } from "../../../src/api/get-database-user";
 import getLocation from "../../../src/api/get-location";
+import getUser from "../../../src/api/get-user";
 import { upsertDatabaseUser } from "../../../src/api/upsert-database-user";
 import { WeatherData } from "../../../src/components/interfaces";
 
@@ -17,16 +18,6 @@ type Data = {
   weather: WeatherData;
 };
 type ErrorData = { message: string };
-
-const getUser = (req: NextApiRequest, res: NextApiResponse) => {
-  const session = getSession(req, res);
-  if (!session)
-    throw new Error(
-      "No session. Did you forget to wrap the handler function in withApiAuthRequired?"
-    );
-  const { user } = session;
-  return user;
-};
 
 const isCityInput = (body: Partial<CityInput | Point>): body is CityInput => {
   return (

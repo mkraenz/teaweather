@@ -332,6 +332,10 @@ const NAV_ITEMS: Array<NavItem> = [
     href: "/five-days",
   },
   {
+    label: "My Locations",
+    href: "/locations",
+  },
+  {
     label: "Learn more",
     children: [
       {
