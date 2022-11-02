@@ -49,6 +49,57 @@ Resources:
       RestApiId: !Ref Api
       StageName: prod
 
+  ApiUserLocationsReqBodyModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: application/json
+      Description: Request body for the POST /users route
+      Name: UserLocationBody
+      RestApiId: !Ref Api
+      Schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        title: UserLocationRequestBodySchema
+        type: object
+        required:
+          - userId
+          - locations
+        # IMPORTANT: api gw still allows to send more properties than defined here
+        properties:
+          userId:
+            type: string
+            description: "The user id / oauth sub"
+            minLength: 1 # non-empty string
+          locations:
+            type: array
+            items:
+              type: object
+              required:
+                - lat
+                - lon
+              # IMPORTANT: api gw still allows to send more properties than defined here
+              properties:
+                lat:
+                  type: number
+                  description: "The latitude of the location"
+                lon:
+                  type: number
+                  description: "The longitude of the location"
+                city:
+                  type: string
+                  description: "The city of the location that the user originally entered"
+                countryCode:
+                  type: number
+                  pattern: "^[A-Z]{2}$"
+                  description: "the 2 letter country code of the location"
+
+  ApiRequestBodyValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties:
+      Name: RequestBodyValidator
+      RestApiId: !Ref Api
+      ValidateRequestBody: true
+      ValidateRequestParameters: false
+
   UsersMethodPost:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -57,11 +108,14 @@ Resources:
       HttpMethod: POST
       ApiKeyRequired: true
       AuthorizationType: None
+      RequestModels:
+        application/json: !Ref ApiUserLocationsReqBodyModel
+      RequestValidatorId: !Ref ApiRequestBodyValidator
       Integration:
         Type: AWS
-        Credentials: !GetAtt APIGatewayRole.Arn
         # Should always be POST when integrating with AWS services
         IntegrationHttpMethod: POST
+        Credentials: !GetAtt APIGatewayRole.Arn
         # More info: https://docs.aws.amazon.com/apigateway/api-reference/resource/integration/
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem"
         PassthroughBehavior: WHEN_NO_TEMPLATES
