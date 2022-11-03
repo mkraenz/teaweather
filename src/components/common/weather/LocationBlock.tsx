@@ -91,7 +91,7 @@ const LocationBlock: FC<Props> = ({
       <HStack
         position={"relative"} // for the delete icon
         padding={{ base: 0, md: 4 }}
-        gap="20px"
+        gap={6}
         alignItems={"flex-start"}
         _hover={{
           bg: hoverBg,

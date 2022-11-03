@@ -105,11 +105,7 @@ const Locations: NextPage<Props> = (props) => {
   return (
     <>
       <PageHead />
-      <VStack
-        justifyContent={"center"}
-        gap="var(--chakra-space-16) !important"
-        pt={16}
-      >
+      <VStack justifyContent={"center"} gap={{ base: 8, md: 16 }} pt={16}>
         <Heading2 as="h1" text={`my locations`} textTransform="capitalize" />
         <SearchByCity
           onInput={setLocationSearch}

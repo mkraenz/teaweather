@@ -12,7 +12,7 @@ interface Props {
 
 const WeatherBlock: FC<Props> = ({ weather, withLocation, customLocation }) => {
   return (
-    <HStack gap="20px" alignItems={"flex-start"}>
+    <HStack gap={4} alignItems={"flex-start"}>
       <WeatherIcon
         typeId={weather.weatherTypeId}
         description={weather.description}
