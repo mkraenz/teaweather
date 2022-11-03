@@ -13,7 +13,7 @@ type City = { city: string; country: string } & Point;
 // TODO maybe include a custom name property
 type Location = City | Point;
 
-type Data = {
+export type AddResponseData = {
   location: Location;
   weather: WeatherData;
 };
@@ -50,14 +50,14 @@ const log = (message: string, obj?: any) => {
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data | ErrorData>
+  res: NextApiResponse<AddResponseData | ErrorData>
 ) {
   if (req.method !== "POST")
     return res.status(405).json({ message: "Method not allowed" });
 
   let body: Partial<CityInput | Point>;
   try {
-    body = JSON.parse(req.body);
+    body = typeof req.body === "object" ? req.body : JSON.parse(req.body);
   } catch (error) {
     return res.status(400).json({ message: "Invalid body. Not a JSON" });
   }
@@ -91,10 +91,11 @@ async function handler(
     );
   else log("no existing user found");
 
+  // TODO handle duplicate locations
   const upsert = {
     userId: id,
     locations: [
-      ...(existingUser?.locations || []),
+      // newest location first
       {
         lat: location.latitude,
         lon: location.longitude,
@@ -105,6 +106,7 @@ async function handler(
             }
           : {}),
       },
+      ...(existingUser?.locations || []),
     ],
   };
   await upsertDatabaseUser(upsert);
@@ -112,8 +114,8 @@ async function handler(
 
   return res.status(201).json({
     location: {
-      city: "TODO",
-      country: "TODO",
+      city: isCityInput(body) ? body.city : "TODO",
+      country: isCityInput(body) ? body.country : "TODO",
       lat: location.latitude,
       lon: location.longitude,
     },

@@ -1,4 +1,4 @@
-import { SearchIcon } from "@chakra-ui/icons";
+import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   FormControl,
   FormLabel,
@@ -13,9 +13,16 @@ import { FC, KeyboardEventHandler } from "react";
 interface Props {
   onInput: (value: string) => void;
   onSearch: () => void;
+  label?: string;
+  icon?: "search" | "add";
 }
 
-const SearchByCity: FC<Props> = ({ onInput, onSearch }) => {
+const SearchByCity: FC<Props> = ({
+  onInput,
+  onSearch,
+  label = "Search by City and Country",
+  icon = "search",
+}) => {
   const searchInputTextColor = useColorModeValue("gray.600", "gray.300");
   const searchButtonColor = useColorModeValue("cyan.300", "blue.700");
   const searchButtonHoverColor = useColorModeValue("cyan.200", "blue.800");
@@ -39,7 +46,7 @@ const SearchByCity: FC<Props> = ({ onInput, onSearch }) => {
         fontWeight={"normal"}
         color={searchInputTextColor}
       >
-        Search by City and Country
+        {label}
       </FormLabel>
       <InputGroup size="md">
         <Input
@@ -57,7 +64,7 @@ const SearchByCity: FC<Props> = ({ onInput, onSearch }) => {
             size="md"
             aria-label="Search"
             onClick={onSearch}
-            icon={<SearchIcon />}
+            icon={icon === "search" ? <SearchIcon /> : <AddIcon />}
             color={searchInputTextColor}
             _hover={{
               bg: searchButtonHoverColor,

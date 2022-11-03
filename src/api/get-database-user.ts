@@ -19,7 +19,6 @@ export const getDatabaseUser = async (userId: string) => {
   if (!apiBase || !apiKey) throw new Error("Environment variable not set.");
 
   const url = new URL(`${apiBase}/users/${userId}`);
-  console.log("url", url);
   const res = await fetch(url.toString(), {
     headers: {
       "x-api-key": apiKey,

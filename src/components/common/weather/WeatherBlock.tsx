@@ -7,9 +7,10 @@ import WeatherIcon from "./WeatherIcon";
 interface Props {
   weather: WeatherData;
   withLocation?: boolean;
+  customLocation?: string | undefined;
 }
 
-const WeatherBlock: FC<Props> = ({ weather, withLocation }) => {
+const WeatherBlock: FC<Props> = ({ weather, withLocation, customLocation }) => {
   return (
     <HStack gap="20px" alignItems={"flex-start"}>
       <WeatherIcon
@@ -20,7 +21,7 @@ const WeatherBlock: FC<Props> = ({ weather, withLocation }) => {
       <VStack alignItems={"flex-end"} pr={4}>
         {withLocation && (
           <Text as="h3" fontSize={"2xl"}>
-            {weather.location}
+            {customLocation || weather.location}
           </Text>
         )}
         <Text>

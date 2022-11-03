@@ -15,8 +15,6 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<GetAllLocationsResponse200Data | ErrorData>
 ) {
-  const x = 5;
-  console.log("hey", x);
   if (req.method !== "GET")
     return res.status(405).json({ message: "Method not allowed" });
 
