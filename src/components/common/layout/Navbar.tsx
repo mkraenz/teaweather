@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/icons";
 import {
   Box,
-  Button,
   Collapse,
   Flex,
   Icon,
@@ -29,6 +28,8 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FC } from "react";
 import MyAvatar from "./MyAvatar";
+import SignInButton from "./SignInButton";
+import SignUpButton from "./SignUpButton";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
@@ -266,38 +267,6 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
   );
 };
 
-const SignUpButton: FC = () => {
-  return (
-    <Button
-      as={NextLink}
-      display={{ base: "none", md: "inline-flex" }}
-      fontSize={"sm"}
-      fontWeight={600}
-      color={"white"}
-      bg={"pink.400"}
-      href={SIGNUP_LINK}
-      _hover={{
-        bg: "pink.300",
-      }}
-    >
-      Sign Up
-    </Button>
-  );
-};
-const SignInButton: FC = () => {
-  return (
-    <Button
-      as={NextLink}
-      fontSize={"sm"}
-      fontWeight={600}
-      variant={"link"}
-      href={SIGNIN_LINK}
-    >
-      Sign In
-    </Button>
-  );
-};
-
 const ColorModeIconButton: FC = () => {
   const { toggleColorMode, colorMode } = useColorMode();
 
@@ -320,8 +289,6 @@ interface NavItem {
   href?: string;
 }
 
-const SIGNUP_LINK = "/api/auth/signup";
-const SIGNIN_LINK = "/api/auth/login";
 const NAV_ITEMS: Array<NavItem> = [
   {
     label: "Home",
