@@ -6,8 +6,12 @@ import theme from "../src/components/common/layout/theme";
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
+  // pass `user` prop from pages that require server-side rendering to prepopulate the `useUser` hook.
+  // do this via `maybeGetUser(..)` in getServerSideProps of the page
+  const { user } = pageProps;
+
   return (
-    <UserProvider>
+    <UserProvider user={user}>
       <ChakraProvider
         theme={theme}
         // To avoid initial flickering in dark mode / support SSR

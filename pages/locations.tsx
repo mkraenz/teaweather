@@ -1,9 +1,20 @@
-import { Skeleton, VStack, Wrap, WrapItem } from "@chakra-ui/react";
+import { useUser } from "@auth0/nextjs-auth0";
+import {
+  Skeleton,
+  Stack,
+  Text,
+  VStack,
+  Wrap,
+  WrapItem,
+} from "@chakra-ui/react";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
+import { maybeGetUser } from "../src/api/get-user";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
+import SignInButton from "../src/components/common/layout/SignInButton";
+import SignUpButton from "../src/components/common/layout/SignUpButton";
 import SearchByCity from "../src/components/common/SearchByCity";
 import LocationBlock from "../src/components/common/weather/LocationBlock";
 import { WeatherData } from "../src/components/interfaces";
@@ -14,6 +25,40 @@ type Point = { lat: number; lon: number };
 type City = { city: string; country: string } & Point;
 type Location = City | Point;
 
+const PageHead = () => (
+  <Head>
+    <title>TeaWeather - My Locations</title>
+    <meta
+      name="description"
+      content="Weather forecast for my favorite locations"
+    />
+  </Head>
+);
+
+const UnauthenticatedLocations = () => (
+  <>
+    <PageHead />
+    <VStack
+      justifyContent={"center"}
+      gap="var(--chakra-space-16) !important"
+      pt={16}
+    >
+      <Heading2 as="h1" text={`my locations`} textTransform="capitalize" />
+      <Text>Please sign in to track custom locations.</Text>
+
+      <Stack
+        flex={{ base: 1, md: 0 }}
+        justify={"flex-end"}
+        direction={"row"}
+        spacing={6}
+      >
+        <SignInButton />
+        <SignUpButton />
+      </Stack>
+    </VStack>
+  </>
+);
+
 interface Props {
   locations: { location: Location; weather: WeatherData }[];
 }
@@ -23,6 +68,7 @@ const Locations: NextPage<Props> = (props) => {
   const [locations, setLocations] = useState(props.locations);
   const [locationSearch, setLocationSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const { user } = useUser();
 
   const addLocation = async () => {
     if (!locationSearch) return;
@@ -54,16 +100,11 @@ const Locations: NextPage<Props> = (props) => {
     setLoading(false);
   };
 
+  if (!user) return <UnauthenticatedLocations />;
+
   return (
     <>
-      <Head>
-        <title>TeaWeather - My Locations</title>
-        <meta
-          name="description"
-          content="Weather forecast for my favorite locations"
-        />
-      </Head>
-
+      <PageHead />
       <VStack
         justifyContent={"center"}
         gap="var(--chakra-space-16) !important"
@@ -104,6 +145,7 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
   const baseUrl = process.env.BASE_URL ?? "";
   const cookie = context.req?.headers.cookie ?? "";
+  const user = maybeGetUser(context.req, context.res);
   let locations: Props["locations"] = [];
 
   const res = await fetch(`${baseUrl}/api/locations/get-all`, {
@@ -144,6 +186,7 @@ export const getServerSideProps: GetServerSideProps<
     props: {
       cookies: workaround.props.cookies,
       locations,
+      user,
     },
   };
 };

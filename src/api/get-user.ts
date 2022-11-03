@@ -1,8 +1,7 @@
 import { getSession } from "@auth0/nextjs-auth0";
-import type { NextApiRequest, NextApiResponse } from "next";
 
-const getUser = (req: NextApiRequest, res: NextApiResponse) => {
-  const session = getSession(req, res);
+const getUser = (...args: Parameters<typeof getSession>) => {
+  const session = getSession(...args);
   if (!session)
     throw new Error(
       "No session. Did you forget to wrap the handler function in withApiAuthRequired?"
@@ -12,3 +11,10 @@ const getUser = (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default getUser;
+
+export const maybeGetUser = (...args: Parameters<typeof getSession>) => {
+  const session = getSession(...args);
+  if (!session) return null;
+  const { user } = session;
+  return user;
+};
