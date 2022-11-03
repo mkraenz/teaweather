@@ -89,6 +89,7 @@ const LocationBlock: FC<Props> = ({
         location={location}
       />
       <HStack
+        position={"relative"} // for the delete icon
         padding={{ base: 0, md: 4 }}
         gap="20px"
         alignItems={"flex-start"}
@@ -99,23 +100,6 @@ const LocationBlock: FC<Props> = ({
         onMouseOut={toggleDeleteIcon}
         rounded="xl"
       >
-        {/* TODO mobile support */}
-        {deleteIconShown && (
-          <IconButton
-            m={{ base: 0, md: -4 }} // quickfix: position at top left of HStack by reverting the padding of the HStack
-            position="absolute"
-            size="lg"
-            _hover={{ bg: deleteIconButtonHoverBg }}
-            variant="ghost"
-            aria-label={`delete the location ${location}. Opens a confirmation modal.`}
-            icon={<DeleteIcon />}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation(); // don't trigger the link
-              onOpen();
-            }}
-          />
-        )}
         <WeatherIcon
           typeId={weather.weatherTypeId}
           description={weather.description}
@@ -135,6 +119,25 @@ const LocationBlock: FC<Props> = ({
           </Text>
           <Text fontSize={"lg"}>{weather.description}</Text>
         </VStack>
+
+        {/* TODO mobile support */}
+        {deleteIconShown && (
+          <IconButton
+            top={0}
+            left={-2} // cancels out the padding: 4 on the parent
+            position="absolute"
+            size="lg"
+            _hover={{ bg: deleteIconButtonHoverBg }}
+            variant="ghost"
+            aria-label={`delete the location ${location}. Opens a confirmation modal.`}
+            icon={<DeleteIcon />}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation(); // don't trigger the link
+              onOpen();
+            }}
+          />
+        )}
       </HStack>
     </NextLink>
   );
