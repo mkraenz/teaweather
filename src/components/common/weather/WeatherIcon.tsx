@@ -1,4 +1,4 @@
-import Image from "next/image";
+import NextImage from "next/image";
 import { FC } from "react";
 
 /** @see https://openweathermap.org/weather-conditions */
@@ -78,13 +78,14 @@ const AmChartWeatherIcon: FC<IconProps> = ({
   animated = true,
   filename,
 }) => (
-  <Image
+  <NextImage
     src={`/amcharts-weather-icons${
       animated ? "/animated" : ""
     }/${filename}.svg`}
     alt={alt}
     width={size}
     height={size}
+    style={{ alignSelf: "center" }}
   />
 );
 
