@@ -5,7 +5,7 @@ import { useState } from "react";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import SearchByCity from "../src/components/common/SearchByCity";
-import WeatherBlock from "../src/components/common/weather/WeatherBlock";
+import LocationBlock from "../src/components/common/weather/LocationBlock";
 import { WeatherData } from "../src/components/interfaces";
 import { AddResponseData } from "./api/locations/add";
 import { GetAllLocationsResponse200Data } from "./api/locations/get-all";
@@ -76,10 +76,10 @@ const Locations: NextPage<Props> = (props) => {
           label="Track a new location"
           icon="add"
         />
-        <Wrap spacing={8}>
+        <Wrap spacing={8} justify={"center"}>
           {(locations || props.locations).map(({ location, weather }, i) => (
             <WrapItem key={i}>
-              <WeatherBlock
+              <LocationBlock
                 weather={weather}
                 withLocation
                 customLocation={
