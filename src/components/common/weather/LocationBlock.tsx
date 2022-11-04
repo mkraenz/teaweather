@@ -1,4 +1,4 @@
-import { DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Button,
   HStack,
@@ -12,12 +12,13 @@ import {
   ModalOverlay,
   Text,
   useBoolean,
+  useBreakpointValue,
   useColorModeValue,
   useDisclosure,
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { FC } from "react";
+import { FC, MouseEventHandler } from "react";
 import { WeatherData } from "../../interfaces";
 import WeatherDetails from "./WeatherDetails";
 import WeatherIcon from "./WeatherIcon";
@@ -71,10 +72,23 @@ const LocationBlock: FC<Props> = ({
   const deleteIconButtonHoverBg = useColorModeValue("red.300", "red.500");
   const [deleteIconShown, { toggle: toggleDeleteIcon }] = useBoolean(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toolbarHiddenOnMobile = useBreakpointValue(
+    { base: true, md: false },
+    { fallback: "md" }
+  );
 
+  const openDeleteConfirmation: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // don't trigger the link
+    onOpen();
+  };
   const deleteLocation = () => {
     // TODO api call to delete location. Here I might get into trouble with state management
+    alert("Feature coming soon");
     onClose();
+  };
+  const editLocation = () => {
+    alert("Feature coming soon");
   };
 
   const location = customLocation || weather.location;
@@ -119,25 +133,22 @@ const LocationBlock: FC<Props> = ({
           </Text>
           <Text fontSize={"lg"}>{weather.description}</Text>
         </VStack>
-
         {/* TODO mobile support */}
-        {deleteIconShown && (
+        <VStack alignSelf={"center"} hidden={toolbarHiddenOnMobile}>
           <IconButton
-            top={0}
-            left={-2} // cancels out the padding: 4 on the parent
-            position="absolute"
-            size="lg"
-            _hover={{ bg: deleteIconButtonHoverBg }}
-            variant="ghost"
-            aria-label={`delete the location ${location}. Opens a confirmation modal.`}
-            icon={<DeleteIcon />}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation(); // don't trigger the link
-              onOpen();
-            }}
+            icon={<EditIcon />}
+            aria-label={"Edit this location"}
+            visibility={deleteIconShown ? "visible" : "hidden"}
+            onClick={editLocation}
           />
-        )}
+          <IconButton
+            icon={<DeleteIcon />}
+            aria-label={`delete the location ${location}. Opens a confirmation modal.`}
+            _hover={{ bg: deleteIconButtonHoverBg }}
+            onClick={openDeleteConfirmation}
+            visibility={deleteIconShown ? "visible" : "hidden"}
+          />
+        </VStack>
       </HStack>
     </NextLink>
   );
