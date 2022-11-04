@@ -18,6 +18,7 @@ import SignUpButton from "../src/components/common/layout/SignUpButton";
 import SearchByCity from "../src/components/common/SearchByCity";
 import LocationBlock from "../src/components/common/weather/LocationBlock";
 import { WeatherData } from "../src/components/interfaces";
+import { Env } from "./api/env";
 import { AddResponseData } from "./api/locations/add";
 import { GetAllLocationsResponse200Data } from "./api/locations/get-all";
 
@@ -145,7 +146,7 @@ export const getServerSideProps: GetServerSideProps<
     cookies: string;
   } & Props
 > = async (context) => {
-  const baseUrl = process.env.BASE_URL ?? "";
+  const baseUrl = Env.baseUrl ?? "";
   const cookie = context.req?.headers.cookie ?? "";
   const user = maybeGetUser(context.req, context.res);
   let locations: Props["locations"] = [];

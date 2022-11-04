@@ -1,11 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 import type { NextApiRequest, NextApiResponse } from "next";
+import getCurrentWeather from "../../../src/api/get-current-weather";
 import { getDatabaseUser } from "../../../src/api/get-database-user";
 import getLocation from "../../../src/api/get-location";
 import getUser from "../../../src/api/get-user";
 import { upsertDatabaseUser } from "../../../src/api/upsert-database-user";
 import { WeatherData } from "../../../src/components/interfaces";
+import { Env } from "../env";
 
 type CityInput = { city: string; country: string };
 type Point = { lat: number; lon: number };
@@ -72,10 +74,11 @@ async function handler(
   let location: { longitude: number; latitude: number };
   if (isCityInput(body)) {
     log("found city input. getting location from city...");
-    const openWeatherApiKey = process.env.OPENWEATHERMAP_API_KEY;
-    if (!openWeatherApiKey)
-      throw new Error("Missing env var OPENWEATHERMAP_API_KEY");
-    location = await getLocation(openWeatherApiKey, body.city, body.country);
+    location = await getLocation(
+      Env.openWeatherApiKey,
+      body.city,
+      body.country
+    );
     log("got location from city. location:", JSON.stringify(location));
   } else {
     log("found point input. TODO getting city from coordinates...");
@@ -112,6 +115,8 @@ async function handler(
   await upsertDatabaseUser(upsert);
   log("upserted user");
 
+  const weather = await getCurrentWeather(location, Env.openWeatherApiKey);
+
   return res.status(201).json({
     location: {
       city: isCityInput(body) ? body.city : "TODO",
@@ -119,22 +124,7 @@ async function handler(
       lat: location.latitude,
       lon: location.longitude,
     },
-    weather: {
-      temperature: 20,
-      description: "sunny",
-      windDirection: "N",
-      wind: 10,
-      windUnit: "m/s",
-      humidityUnit: "%",
-      humidity: 50,
-      pressureUnit: "hPa",
-      pressure: 1000,
-      precipitationProbabilityInPercent: 0,
-      location: "Berlin, DE",
-      time: new Date().toISOString(),
-      temperatureUnit: "°C",
-      weatherTypeId: 800,
-    },
+    weather,
   });
 }
 export default withApiAuthRequired(handler);

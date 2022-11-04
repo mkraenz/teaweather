@@ -12,6 +12,7 @@ import useGeolocationBasedWeather from "../src/components/common/use-geolocation
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
 import { WeatherData } from "../src/components/interfaces";
+import { Env } from "./api/env";
 import type weatherCurrentApi from "./api/weather-current";
 
 interface Props {
@@ -71,7 +72,7 @@ export const getServerSideProps: GetServerSideProps<
     cookies: string;
   } & Props
 > = async (context) => {
-  const baseUrl = process.env.BASE_URL ?? ""; // when this is executed on server, env var is defined. But when executed on client, env var is undefined. With fallback, we ensure a relative api call from the client
+  const baseUrl = Env.baseUrl ?? ""; // when this is executed on server, env var is defined. But when executed on client, env var is undefined. With fallback, we ensure a relative api call from the client
   const cookies = context.req?.headers.cookie ?? "";
 
   const url = getLocationUrl(cookies, baseUrl, "/weather-current");

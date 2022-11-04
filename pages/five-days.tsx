@@ -10,6 +10,7 @@ import useGeolocationBasedWeather from "../src/components/common/use-geolocation
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
 import { WeatherData } from "../src/components/interfaces";
+import { Env } from "./api/env";
 import weatherFiveDays from "./api/weather-five-days";
 
 interface Props {
@@ -78,7 +79,7 @@ export const getServerSideProps: GetServerSideProps<
     cookies: string;
   } & Props
 > = async (context) => {
-  const baseUrl = process.env.BASE_URL ?? "";
+  const baseUrl = Env.baseUrl ?? "";
   const cookies = context.req?.headers.cookie ?? "";
 
   const url = getLocationUrl(cookies, baseUrl, "/weather-five-days");
