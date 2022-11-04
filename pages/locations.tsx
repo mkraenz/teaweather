@@ -114,6 +114,13 @@ const Locations: NextPage<Props> = (props) => {
           icon="add"
         />
         <Wrap spacing={8} justify={"center"}>
+          {loading && (
+            <Skeleton
+              height={135}
+              rounded="xl"
+              width={{ base: "full", md: 500 }}
+            />
+          )}
           {(locations || props.locations).map(({ location, weather }, i) => (
             <WrapItem key={i}>
               <LocationBlock
@@ -127,7 +134,6 @@ const Locations: NextPage<Props> = (props) => {
               />
             </WrapItem>
           ))}
-          {loading && <Skeleton height={100} width="full" />}
         </Wrap>
       </VStack>
     </>
