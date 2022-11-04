@@ -18,8 +18,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { FC, MouseEventHandler } from "react";
-import { WeatherData } from "../../interfaces";
+import type { FC, MouseEventHandler } from "react";
+import type { WeatherData } from "../../interfaces";
 import WeatherDetails from "./WeatherDetails";
 import WeatherIcon from "./WeatherIcon";
 

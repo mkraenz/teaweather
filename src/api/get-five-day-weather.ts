@@ -1,5 +1,5 @@
-import { WeatherData } from "../components/interfaces";
-import { OpenWeatherForecast } from "./openweathermap.interface";
+import type { WeatherData } from "../components/interfaces";
+import type { OpenWeatherForecast } from "./openweathermap.interface";
 import windDegreesToDirection from "./wind-degrees-by-direction";
 
 const getFiveDayWeather = async (

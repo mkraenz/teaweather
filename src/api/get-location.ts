@@ -1,4 +1,4 @@
-import { OpenWeatherLocation } from "./openweathermap.interface";
+import type { OpenWeatherLocation } from "./openweathermap.interface";
 
 const Berlin = { longitude: 13.3888599, latitude: 52.5170365 };
 

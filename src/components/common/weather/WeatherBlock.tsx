@@ -1,6 +1,6 @@
 import { HStack, Text, VStack } from "@chakra-ui/react";
-import { FC } from "react";
-import { WeatherData } from "../../interfaces";
+import type { FC } from "react";
+import type { WeatherData } from "../../interfaces";
 import WeatherDetails from "./WeatherDetails";
 import WeatherIcon from "./WeatherIcon";
 

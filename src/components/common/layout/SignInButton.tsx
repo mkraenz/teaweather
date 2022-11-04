@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { FC } from "react";
+import type { FC } from "react";
 
 const SIGNIN_LINK = "/api/auth/login";
 

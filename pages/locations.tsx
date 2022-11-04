@@ -1,4 +1,4 @@
-import { useUser } from "@auth0/nextjs-auth0";
+import { getServerSidePropsWrapper, useUser } from "@auth0/nextjs-auth0";
 import {
   Skeleton,
   Stack,
@@ -7,7 +7,7 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
-import { GetServerSideProps, NextPage } from "next";
+import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import { maybeGetUser } from "../src/api/get-user";
@@ -17,10 +17,11 @@ import SignInButton from "../src/components/common/layout/SignInButton";
 import SignUpButton from "../src/components/common/layout/SignUpButton";
 import SearchByCity from "../src/components/common/SearchByCity";
 import LocationBlock from "../src/components/common/weather/LocationBlock";
-import { WeatherData } from "../src/components/interfaces";
+import type { WeatherData } from "../src/components/interfaces";
 import { Env } from "./api/env";
-import { AddResponseData } from "./api/locations/add";
-import { GetAllLocationsResponse200Data } from "./api/locations/get-all";
+import type { AddResponseData } from "./api/locations/add";
+import type { GetAllLocationsResponse200Data } from "./api/locations/get-all";
+import type { MyGetServerSideProps } from "./_app";
 
 type Point = { lat: number; lon: number };
 type City = { city: string; country: string } & Point;
@@ -141,11 +142,7 @@ const Locations: NextPage<Props> = (props) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<
-  {
-    cookies: string;
-  } & Props
-> = async (context) => {
+const _getServerSideProps: MyGetServerSideProps<Props> = async (context) => {
   const baseUrl = Env.baseUrl ?? "";
   const cookie = context.req?.headers.cookie ?? "";
   const user = maybeGetUser(context.req, context.res);
@@ -193,5 +190,7 @@ export const getServerSideProps: GetServerSideProps<
     },
   };
 };
+export const getServerSideProps =
+  getServerSidePropsWrapper(_getServerSideProps);
 
 export default Locations;

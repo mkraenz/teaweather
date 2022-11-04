@@ -1,7 +1,9 @@
+import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
 import { Text, VStack } from "@chakra-ui/react";
 import Head from "next/head";
+import { maybeGetUser } from "../src/api/get-user";
 import Heading1 from "../src/components/common/Heading1";
-import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
+import type { MyGetServerSideProps } from "./_app";
 
 const PrivacyPolicy = () => {
   return (
@@ -42,6 +44,17 @@ const PrivacyPolicy = () => {
   );
 };
 
-export const getServerSideProps = colorWorkaroundGetServerSideProps;
+const _getServerSideProps: MyGetServerSideProps = async (context) => {
+  const cookie = context.req?.headers.cookie ?? "";
+  const user = maybeGetUser(context.req, context.res);
+  return {
+    props: {
+      cookies: cookie,
+      user,
+    },
+  };
+};
+export const getServerSideProps =
+  getServerSidePropsWrapper(_getServerSideProps);
 
 export default PrivacyPolicy;

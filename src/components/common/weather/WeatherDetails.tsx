@@ -1,6 +1,6 @@
 import { Box, Text } from "@chakra-ui/react";
-import { FC } from "react";
-import { WeatherData } from "../../interfaces";
+import type { FC } from "react";
+import type { WeatherData } from "../../interfaces";
 
 type Props = Pick<
   WeatherData,

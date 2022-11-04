@@ -1,6 +1,6 @@
 import { Button, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { FC } from "react";
+import type { FC } from "react";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 

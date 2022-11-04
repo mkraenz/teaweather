@@ -1,6 +1,6 @@
 import { Flex, Link, Text, useColorModeValue } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { FC } from "react";
+import type { FC } from "react";
 
 interface Props {}
 

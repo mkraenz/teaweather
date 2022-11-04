@@ -1,17 +1,20 @@
+import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
 import { VStack } from "@chakra-ui/react";
-import { GetServerSideProps, NextPage } from "next";
+import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { ApiData } from "../src/api/types";
+import { maybeGetUser } from "../src/api/get-user";
+import type { ApiData } from "../src/api/types";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import SearchByCity from "../src/components/common/SearchByCity";
 import useGeolocationBasedWeather from "../src/components/common/use-geolocation-based-weather.hook";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
-import { WeatherData } from "../src/components/interfaces";
+import type { WeatherData } from "../src/components/interfaces";
 import { Env } from "./api/env";
-import weatherFiveDays from "./api/weather-five-days";
+import type weatherFiveDays from "./api/weather-five-days";
+import type { MyGetServerSideProps } from "./_app";
 
 interface Props {
   weathers: WeatherData[];
@@ -74,13 +77,10 @@ const FiveDays: NextPage<Props> = (props) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<
-  {
-    cookies: string;
-  } & Props
-> = async (context) => {
+const _getServerSideProps: MyGetServerSideProps<Props> = async (context) => {
   const baseUrl = Env.baseUrl ?? "";
   const cookies = context.req?.headers.cookie ?? "";
+  const user = maybeGetUser(context.req, context.res);
 
   const url = getLocationUrl(cookies, baseUrl, "/weather-five-days");
   const res = await fetch(url.toString());
@@ -92,8 +92,11 @@ export const getServerSideProps: GetServerSideProps<
     props: {
       cookies: workaround.props.cookies,
       weathers: json.weathers,
+      user,
     },
   };
 };
+export const getServerSideProps =
+  getServerSidePropsWrapper(_getServerSideProps);
 
 export default FiveDays;

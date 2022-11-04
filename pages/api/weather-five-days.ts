@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import getFiveDayWeather from "../../src/api/get-five-day-weather";
 import getLocation from "../../src/api/get-location";
-import { WeatherData } from "../../src/components/interfaces";
+import type { WeatherData } from "../../src/components/interfaces";
 import { Env } from "./env";
 
 type Data = {

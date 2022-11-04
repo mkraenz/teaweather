@@ -8,7 +8,7 @@ import {
   InputRightElement,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { FC, KeyboardEventHandler } from "react";
+import type { FC, KeyboardEventHandler } from "react";
 
 interface Props {
   onInput: (value: string) => void;

@@ -16,7 +16,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { FC } from "react";
+import type { FC } from "react";
 
 interface RendererProps {
   avatarSrc: string;

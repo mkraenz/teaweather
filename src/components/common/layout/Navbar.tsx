@@ -26,7 +26,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { FC } from "react";
+import type { FC } from "react";
 import MyAvatar from "./MyAvatar";
 import SignInButton from "./SignInButton";
 import SignUpButton from "./SignUpButton";

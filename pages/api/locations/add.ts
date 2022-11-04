@@ -6,7 +6,7 @@ import { getDatabaseUser } from "../../../src/api/get-database-user";
 import getLocation from "../../../src/api/get-location";
 import getUser from "../../../src/api/get-user";
 import { upsertDatabaseUser } from "../../../src/api/upsert-database-user";
-import { WeatherData } from "../../../src/components/interfaces";
+import type { WeatherData } from "../../../src/components/interfaces";
 import { Env } from "../env";
 
 type CityInput = { city: string; country: string };
