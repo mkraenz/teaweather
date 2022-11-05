@@ -26,9 +26,10 @@ from repository root, run
 
 ```sh
 # first time only
-aws cloudformation create-stack --stack-name teaweather --template-body file://cloudformation-template.yaml --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --stack-name teaweather --template-body file://cloudformation-template.yaml --capabilities CAPABILITY_NAMED_IAM
+
 # update stack
-aws cloudformation update-stack --stack-name teaweather --template-body file://cloudformation-template.yaml --capabilities CAPABILITY_IAM | jq .StackId
+aws cloudformation update-stack --stack-name teaweather --template-body file://cloudformation-template.yaml --capabilities CAPABILITY_NAMED_IAM | jq .StackId
 
 # describe stack
 STACK_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq '.Stacks[0].StackId')

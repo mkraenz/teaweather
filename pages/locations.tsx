@@ -10,6 +10,7 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
+import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
@@ -18,14 +19,14 @@ import SignUpButton from "../src/components/common/layout/SignUpButton";
 import SearchByCity from "../src/components/common/SearchByCity";
 import LocationBlock from "../src/components/common/weather/LocationBlock";
 import type { WeatherData } from "../src/components/interfaces";
-import { Env } from "./api/env";
 import type { AddResponseData } from "./api/locations/add";
 import type { GetAllLocationsResponse200Data } from "./api/locations/get-all";
 import type { MyGetServerSideProps } from "./_app";
 
 type Point = { lat: number; lon: number };
 type City = { city: string; country: string } & Point;
-type Location = City | Point;
+type Location = (City | Point) & { id: string; customName?: string };
+// TODO continue here
 
 const PageHead = () => (
   <Head>

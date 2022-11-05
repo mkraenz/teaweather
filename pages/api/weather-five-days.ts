@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Env } from "../../src/api/env";
 import getFiveDayWeather from "../../src/api/get-five-day-weather";
 import getLocation from "../../src/api/get-location";
 import type { WeatherData } from "../../src/components/interfaces";
-import { Env } from "./env";
 
 type Data = {
   weathers: WeatherData[];

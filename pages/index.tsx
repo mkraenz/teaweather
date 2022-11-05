@@ -3,6 +3,7 @@ import { VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
+import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import type { ApiData } from "../src/api/types";
 import Heading1 from "../src/components/common/Heading1";
@@ -13,7 +14,6 @@ import useGeolocationBasedWeather from "../src/components/common/use-geolocation
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
 import type { WeatherData } from "../src/components/interfaces";
-import { Env } from "./api/env";
 import type weatherCurrentApi from "./api/weather-current";
 import type { MyGetServerSideProps } from "./_app";
 

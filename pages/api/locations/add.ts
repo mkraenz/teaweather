@@ -1,13 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Env } from "../../../src/api/env";
 import getCurrentWeather from "../../../src/api/get-current-weather";
 import { getDatabaseUser } from "../../../src/api/get-database-user";
 import getLocation from "../../../src/api/get-location";
 import getUser from "../../../src/api/get-user";
 import { upsertDatabaseUser } from "../../../src/api/upsert-database-user";
 import type { WeatherData } from "../../../src/components/interfaces";
-import { Env } from "../env";
 
 type CityInput = { city: string; country: string };
 type Point = { lat: number; lon: number };
