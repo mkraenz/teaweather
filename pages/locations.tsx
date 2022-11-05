@@ -10,6 +10,7 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
+import type { ILocation } from "../src/api/domain/Location";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import Heading2 from "../src/components/common/Heading2";
@@ -22,11 +23,6 @@ import type { WeatherData } from "../src/components/interfaces";
 import type { AddResponseData } from "./api/locations/add";
 import type { GetAllLocationsResponse200Data } from "./api/locations/get-all";
 import type { MyGetServerSideProps } from "./_app";
-
-type Point = { lat: number; lon: number };
-type City = { city: string; country: string } & Point;
-type Location = (City | Point) & { id: string; customName?: string };
-// TODO continue here
 
 const PageHead = () => (
   <Head>
@@ -63,7 +59,7 @@ const UnauthenticatedLocations = () => (
 );
 
 interface Props {
-  locations: { location: Location; weather: WeatherData }[];
+  locations: { location: ILocation; weather: WeatherData }[];
 }
 
 // TODO if not logged in, show login button and feature preview
@@ -131,7 +127,7 @@ const Locations: NextPage<Props> = (props) => {
                 withLocation
                 customLocation={
                   "city" in location
-                    ? `${location.city}, ${location.country}`
+                    ? `${location.city}, ${location.countryCode}`
                     : undefined
                 }
               />

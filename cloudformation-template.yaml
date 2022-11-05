@@ -1,20 +1,22 @@
-# https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/
-# and https://serverlessland.com/patterns/apigw-dynamodb-sls
-
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "AWS CloudFormation template that defines necessary metadata, creates a dynamodb instance and an api gateway with an api key to allow external access to the dynamodb instance"
 
 Resources:
-  UsersTable:
+  DbTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
     Properties:
-      TableName: !Sub ${AWS::StackName}
+      TableName: !Sub ${AWS::StackName}-db
       AttributeDefinitions:
-        - AttributeName: id # = user id / oauth sub. We save everything inside a single user column.
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
           AttributeType: S
       KeySchema:
-        - AttributeName: id
+        - AttributeName: pk
           KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
@@ -22,193 +24,12 @@ Resources:
         - Key: CreatedVia
           Value: !Sub CloudFormation ${AWS::StackName} template
 
-  Api:
-    Type: AWS::ApiGateway::RestApi
+  NextjsToDynamoDBUser:
+    Type: AWS::IAM::User
     Properties:
-      Name: !Sub ${AWS::StackName}
-      ApiKeySourceType: HEADER
-      EndpointConfiguration:
-        Types:
-          - REGIONAL
-      Tags:
-        - Key: CreatedVia
-          Value: !Sub CloudFormation ${AWS::StackName} template
-
-  UsersApiResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref Api
-      ParentId: !GetAtt Api.RootResourceId
-      PathPart: users
-
-  ApiDeployment:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn:
-      - UsersMethodPost
-    Properties:
-      RestApiId: !Ref Api
-      StageName: prod
-
-  ApiUserLocationsReqBodyModel:
-    Type: AWS::ApiGateway::Model
-    Properties:
-      ContentType: application/json
-      Description: Request body for the POST /users route
-      Name: UserLocationBody
-      RestApiId: !Ref Api
-      Schema:
-        $schema: "http://json-schema.org/draft-04/schema#"
-        title: UserLocationRequestBodySchema
-        type: object
-        required:
-          - userId
-          - locations
-        # IMPORTANT: api gw still allows to send more properties than defined here
-        properties:
-          userId:
-            type: string
-            description: "The user id / oauth sub"
-            minLength: 1 # non-empty string
-          locations:
-            type: array
-            items:
-              type: object
-              required:
-                - lat
-                - lon
-              # IMPORTANT: api gw still allows to send more properties than defined here
-              properties:
-                lat:
-                  type: number
-                  description: "The latitude of the location"
-                lon:
-                  type: number
-                  description: "The longitude of the location"
-                city:
-                  type: string
-                  description: "The city of the location that the user originally entered"
-                countryCode:
-                  type: number
-                  pattern: "^[A-Z]{2}$"
-                  description: "the 2 letter country code of the location"
-
-  ApiRequestBodyValidator:
-    Type: AWS::ApiGateway::RequestValidator
-    Properties:
-      Name: RequestBodyValidator
-      RestApiId: !Ref Api
-      ValidateRequestBody: true
-      ValidateRequestParameters: false
-
-  UsersMethodPost:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref Api
-      ResourceId: !Ref UsersApiResource
-      HttpMethod: POST
-      ApiKeyRequired: true
-      AuthorizationType: None
-      RequestModels:
-        application/json: !Ref ApiUserLocationsReqBodyModel
-      RequestValidatorId: !Ref ApiRequestBodyValidator
-      Integration:
-        Type: AWS
-        # Should always be POST when integrating with AWS services
-        IntegrationHttpMethod: POST
-        Credentials: !GetAtt APIGatewayRole.Arn
-        # More info: https://docs.aws.amazon.com/apigateway/api-reference/resource/integration/
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem"
-        PassthroughBehavior: WHEN_NO_TEMPLATES
-        RequestTemplates:
-          # Build the structure of the request that is sent when calling DynamoDB PutItem
-          # Example body when making API request: {"userId": "1234", "locations": [{"lat": 1.0, "lon": 2.0}]}
-          application/json: !Sub |
-            {
-              "TableName": "${UsersTable}",
-              "Item": {
-                "id": {
-                  "S": "$util.escapeJavaScript($input.path('userId'))"
-                },
-                "locations": {
-                  "S": "$util.escapeJavaScript($input.json('$.locations'))"
-                }
-              }
-            }
-        IntegrationResponses:
-          - StatusCode: "200"
-            ResponseTemplates:
-              # DynamoDB does not send a response
-              application/json: "{}"
-      MethodResponses:
-        - StatusCode: "200"
-
-  GetUserApiResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref Api
-      ParentId: !GetAtt UsersApiResource.ResourceId
-      PathPart: "{userId}"
-
-  UsersMethodGet:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref Api
-      ResourceId: !Ref GetUserApiResource
-      HttpMethod: GET
-      ApiKeyRequired: true
-      AuthorizationType: None
-      Integration:
-        Type: AWS
-        Credentials: !GetAtt APIGatewayRole.Arn
-        # Should always be POST when integrating with AWS services
-        IntegrationHttpMethod: POST
-        # More info: https://docs.aws.amazon.com/apigateway/api-reference/resource/integration/
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/GetItem"
-        PassthroughBehavior: WHEN_NO_TEMPLATES
-        RequestTemplates:
-          # we need to url decode this since auth0 include chars like pipe in the user's sub, e.g. sub="google-oauth2|11111111111111"
-          application/json: !Sub |
-            {
-              "TableName": "${UsersTable}",
-              "Key": {
-                "id": {
-                  "S": "$util.escapeJavaScript($util.urlDecode($input.params('userId')))"
-                }
-              }
-            }
-        IntegrationResponses:
-          - StatusCode: "200"
-            ResponseTemplates:
-              application/json: |
-                #if($input.path('$.Item.id.S') && !$input.path('$.Item.id.S').empty)
-                #set ($locations = $util.parseJson($input.json('$.Item.locations.S')))
-                #set ($id = $input.json('$.Item.id.S'))
-                {
-                  "userId": $id,                  
-                  "locations": $locations
-                }
-                #else
-                {
-                  "error": "User not found"
-                }
-                #end
-      MethodResponses:
-        - StatusCode: "200"
-
-  APIGatewayRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Action:
-              - sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service:
-                - apigateway.amazonaws.com
+      UserName: !Sub ${AWS::StackName}-nextjs-to-dynamodb-${AWS::Region}
       Policies:
-        - PolicyName: APIGatewayDynamoDBPolicy
+        - PolicyName: NextjsToDynamoDBPolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -219,55 +40,24 @@ Resources:
                   - dynamodb:getItem
                   - dynamodb:updateItem
                   - dynamodb:deleteItem
-                Resource: !GetAtt UsersTable.Arn
+                Resource: !GetAtt DbTable.Arn
       Tags:
         - Key: CreatedVia
           Value: !Sub CloudFormation ${AWS::StackName} template
 
-  TeaWeatherNextjsToApiGwApiKey:
-    Type: AWS::ApiGateway::ApiKey
-    DependsOn:
-      - ApiDeployment
+  NextjsToDynamoDBUserAccessKey:
+    Type: AWS::IAM::AccessKey
     Properties:
-      Description: Api key for TeaWeather Nextjs application hosted on Vercel
-      Enabled: true
-      Name: !Sub ${AWS::StackName}-apikey
-      StageKeys:
-        - RestApiId: !Ref Api
-          StageName: prod
-      Tags:
-        - Key: CreatedVia
-          Value: !Sub CloudFormation ${AWS::StackName} template
-
-  # needed to use the api key
-  ApiUsagePlan:
-    Type: AWS::ApiGateway::UsagePlan
-    DependsOn:
-      - ApiDeployment
-    Properties:
-      ApiStages:
-        - ApiId: !Ref Api
-          Stage: prod
-      Throttle:
-        RateLimit: 20
-        BurstLimit: 200
-      UsagePlanName: !Sub ${AWS::StackName}-usage-plan
-      Quota:
-        Limit: 1000
-        Period: MONTH
-
-  ApiUsagePlanKey:
-    Type: AWS::ApiGateway::UsagePlanKey
-    Properties:
-      KeyType: API_KEY
-      KeyId: !Ref TeaWeatherNextjsToApiGwApiKey
-      UsagePlanId: !Ref ApiUsagePlan
+      Serial: 1
+      Status: Active
+      UserName: !Ref NextjsToDynamoDBUser
 
 Outputs:
-  ApiKey:
-    Description: "API key for TeaWeather Nextjs application hosted on Vercel"
-    Value: !Ref TeaWeatherNextjsToApiGwApiKey
-  ApiId:
-    Value: !Ref Api
-  ApiUrl:
-    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  AccessKeyId:
+    Value: !Ref NextjsToDynamoDBUserAccessKey
+  AccessKeySecret:
+    Value: !GetAtt NextjsToDynamoDBUserAccessKey.SecretAccessKey
+  TableName:
+    Value: !Ref DbTable
+  UserName:
+    Value: !Ref NextjsToDynamoDBUser
