@@ -1,4 +1,3 @@
-// TODO refactor code to use this
 export const Env = {
   openWeatherApiKey: process.env.OPENWEATHERMAP_API_KEY!,
   baseUrl: process.env.BASE_URL!,
