@@ -13,6 +13,7 @@ import { useState } from "react";
 import type { ILocation } from "../src/api/domain/Location";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
+import type { ApiData2 } from "../src/api/types";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import SignInButton from "../src/components/common/layout/SignInButton";
@@ -21,7 +22,7 @@ import SearchByCity from "../src/components/common/SearchByCity";
 import LocationBlock from "../src/components/common/weather/LocationBlock";
 import type { WeatherData } from "../src/components/interfaces";
 import type { AddResponseData } from "./api/locations/add";
-import type { GetAllLocationsResponse200Data } from "./api/locations/get-all";
+import type { LocationsHandlerType } from "./api/locations/[[...params]]";
 import type { MyGetServerSideProps } from "./_app";
 
 const PageHead = () => (
@@ -62,7 +63,6 @@ interface Props {
   locations: { location: ILocation; weather: WeatherData }[];
 }
 
-// TODO if not logged in, show login button and feature preview
 const Locations: NextPage<Props> = (props) => {
   const [locations, setLocations] = useState(props.locations);
   const [locationSearch, setLocationSearch] = useState("");
@@ -73,7 +73,9 @@ const Locations: NextPage<Props> = (props) => {
     if (!locationSearch) return;
     setLoading(true);
     const city = encodeURIComponent(locationSearch.split(",")[0]);
-    const country = encodeURIComponent(locationSearch.split(", ")[1] || "DE");
+    const country = encodeURIComponent(
+      (locationSearch.split(", ")[1] || "DE").toUpperCase()
+    );
     const res = await fetch("/api/locations/add", {
       method: "POST",
       headers: {
@@ -122,15 +124,7 @@ const Locations: NextPage<Props> = (props) => {
           )}
           {(locations || props.locations).map(({ location, weather }, i) => (
             <WrapItem key={i}>
-              <LocationBlock
-                weather={weather}
-                withLocation
-                customLocation={
-                  "city" in location
-                    ? `${location.city}, ${location.countryCode}`
-                    : undefined
-                }
-              />
+              <LocationBlock weather={weather} location={location} />
             </WrapItem>
           ))}
         </Wrap>
@@ -145,13 +139,13 @@ const _getServerSideProps: MyGetServerSideProps<Props> = async (context) => {
   const user = maybeGetUser(context.req, context.res);
   let locations: Props["locations"] = [];
 
-  const res = await fetch(`${baseUrl}/api/locations/get-all`, {
+  const res = await fetch(`${baseUrl}/api/locations`, {
     // need to pass cookies to get past Auth0's withApiAuthRequired in the api route
     headers: { cookie },
   });
 
   if (res.ok) {
-    const json: GetAllLocationsResponse200Data = await res.json();
+    const json: ApiData2<LocationsHandlerType["find"]> = await res.json();
     locations = json.locations.map((location) => ({
       location,
       weather: {

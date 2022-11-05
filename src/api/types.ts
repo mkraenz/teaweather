@@ -7,3 +7,7 @@ export type ApiData<
 
 export type OptionalId<T extends { id: string }> = Omit<T, "id"> &
   Partial<Pick<T, "id">>;
+
+export type ApiData2<Handler extends (...args: any[]) => unknown> = Awaited<
+  ReturnType<Handler>
+>;

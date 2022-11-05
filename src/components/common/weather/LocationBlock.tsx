@@ -19,14 +19,14 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import type { FC, MouseEventHandler } from "react";
+import type { ILocation } from "../../../api/domain/Location";
 import type { WeatherData } from "../../interfaces";
 import WeatherDetails from "./WeatherDetails";
 import WeatherIcon from "./WeatherIcon";
 
 interface Props {
   weather: WeatherData;
-  withLocation?: boolean;
-  customLocation?: string | undefined;
+  location: ILocation;
 }
 
 const ConfirmDeletionModal: FC<{
@@ -63,11 +63,7 @@ const ConfirmDeletionModal: FC<{
   );
 };
 
-const LocationBlock: FC<Props> = ({
-  weather,
-  withLocation,
-  customLocation,
-}) => {
+const LocationBlock: FC<Props> = ({ weather, location }) => {
   const hoverBg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
   const deleteIconButtonHoverBg = useColorModeValue("red.300", "red.500");
   const [deleteIconShown, { toggle: toggleDeleteIcon }] = useBoolean(false);
@@ -82,16 +78,26 @@ const LocationBlock: FC<Props> = ({
     e.stopPropagation(); // don't trigger the link
     onOpen();
   };
-  const deleteLocation = () => {
-    // TODO api call to delete location. Here I might get into trouble with state management
-    alert("Feature coming soon");
+  const deleteLocation = async () => {
+    // TODO global state management
+    const res = await fetch(`/api/locations/${location.id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      alert(
+        "Location deleted. Refresh the page to see the changes. Improved workflow coming soon."
+      );
+    }
     onClose();
   };
   const editLocation = () => {
     alert("Feature coming soon");
   };
 
-  const location = customLocation || weather.location;
+  const locationName =
+    location.customName ||
+    (!!location.city && `${location.city}, ${location.countryCode}`) ||
+    weather.location;
 
   return (
     // TODO link to /locations/[location]
@@ -100,7 +106,7 @@ const LocationBlock: FC<Props> = ({
         isOpen={isOpen}
         onClose={onClose}
         onConfirm={deleteLocation}
-        location={location}
+        location={locationName}
       />
       <HStack
         position={"relative"} // for the delete icon
@@ -120,11 +126,9 @@ const LocationBlock: FC<Props> = ({
         />
         <WeatherDetails {...weather} />
         <VStack alignItems={"flex-end"} pr={4}>
-          {withLocation && (
-            <Text as="h3" fontSize={"2xl"}>
-              {location}
-            </Text>
-          )}
+          <Text as="h3" fontSize={"2xl"}>
+            {locationName}
+          </Text>
           <Text>
             {new Date(weather.time).toLocaleString("en-US", {
               dateStyle: "short",
