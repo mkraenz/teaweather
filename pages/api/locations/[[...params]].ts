@@ -1,7 +1,6 @@
 import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
-  BadRequestException,
   Body,
   createHandler,
   Delete,
@@ -20,6 +19,7 @@ import getCurrentWeather from "../../../src/api/get-current-weather";
 import getLocation from "../../../src/api/get-location";
 import getUser from "../../../src/api/get-user";
 import { AddLocationDto } from "../../../src/api/locations/add-location.input.dto";
+import { ZodValidationPipe } from "../utils/ZodValidationPipe";
 
 const log = (message: string, obj?: any) => {
   if (obj) console.log(`LocationsHandler: ${message}`, JSON.stringify(obj));
@@ -61,11 +61,9 @@ class LocationsHandler {
   public async add(
     @Req() req: NextApiRequest,
     @Res() res: NextApiResponse,
-    @Body() bodyInput: unknown
+    @Body(ZodValidationPipe(AddLocationDto)) body: AddLocationDto
   ) {
-    const body = AddLocationDto.safeParse(bodyInput);
-    if (!body.success) throw new BadRequestException("Invalid body");
-    const loc = await this.getLocationFromInput(body.data);
+    const loc = await this.getLocationFromInput(body);
 
     const user = getUser(req, res);
     const id = user.sub;
