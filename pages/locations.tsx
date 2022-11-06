@@ -9,11 +9,11 @@ import {
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ILocation } from "../src/api/domain/Location";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
-import type { ApiData2 } from "../src/api/types";
+import type { ApiData, ApiData2 } from "../src/api/types";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import SignInButton from "../src/components/common/layout/SignInButton";
@@ -22,6 +22,7 @@ import SearchByCity from "../src/components/common/SearchByCity";
 import LocationBlock from "../src/components/common/weather/LocationBlock";
 import type { WeatherData } from "../src/components/interfaces";
 import type { LocationsHandlerType } from "./api/locations/[[...params]]";
+import type weatherCurrent from "./api/weather-current";
 import type { MyGetServerSideProps } from "./_app";
 
 const PageHead = () => (
@@ -67,6 +68,26 @@ const Locations: NextPage<Props> = (props) => {
   const [locationSearch, setLocationSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
+
+  useEffect(
+    () => {
+      // intentionally unawaited
+      locations.forEach(async (loc) => {
+        const res = await fetch(
+          `/api/weather-current?lat=${loc.location.lat}&lon=${loc.location.lon}`
+        );
+        const weatherRes: ApiData<typeof weatherCurrent> = await res.json();
+        // wow this code is terrible. I wish i'd be using some state management library
+        setLocations((prev) => {
+          const newLocations = [...prev];
+          const l = newLocations.find((x) => x.location.id === loc.location.id);
+          if (l) l.weather = weatherRes.weather;
+          return newLocations;
+        });
+      });
+    },
+    locations.map((l) => l.location.id)
+  );
 
   const addLocation = async () => {
     if (!locationSearch) return;
