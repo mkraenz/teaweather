@@ -21,7 +21,6 @@ import SignUpButton from "../src/components/common/layout/SignUpButton";
 import SearchByCity from "../src/components/common/SearchByCity";
 import LocationBlock from "../src/components/common/weather/LocationBlock";
 import type { WeatherData } from "../src/components/interfaces";
-import type { AddResponseData } from "./api/locations/add";
 import type { LocationsHandlerType } from "./api/locations/[[...params]]";
 import type { MyGetServerSideProps } from "./_app";
 
@@ -72,27 +71,28 @@ const Locations: NextPage<Props> = (props) => {
   const addLocation = async () => {
     if (!locationSearch) return;
     setLoading(true);
-    const city = encodeURIComponent(locationSearch.split(",")[0]);
-    const country = encodeURIComponent(
-      (locationSearch.split(", ")[1] || "DE").toUpperCase()
-    );
-    const res = await fetch("/api/locations/add", {
+    const city = locationSearch.split(",")[0].trim();
+    const countryCode = (
+      locationSearch.split(",")[1].trim() || "DE"
+    ).toUpperCase();
+    const type = "city";
+    const res = await fetch("/api/locations", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ city, country }),
+      body: JSON.stringify({ city, countryCode, type }),
     });
     if (!res.ok) {
       // TODO handle error
       console.error("Error while adding location", res.status, {
         city,
-        country,
+        countryCode,
       });
       setLoading(false);
       return;
     }
-    const data: AddResponseData = await res.json();
+    const data: ApiData2<LocationsHandlerType["add"]> = await res.json();
     setLocations([
       // newest location first
       { weather: data.weather, location: data.location },
