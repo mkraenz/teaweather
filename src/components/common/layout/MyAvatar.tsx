@@ -1,5 +1,5 @@
 import { useUser } from "@auth0/nextjs-auth0";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -30,43 +30,46 @@ const MyAvatarRenderComp: FC<RendererProps> = ({
   userEmail,
 }) => {
   const emailColor = useColorModeValue("gray.600", "whiteAlpha.700");
+  const menuListBgColor = useColorModeValue("white", "gray.900");
+  const menuListBorderColor = useColorModeValue("gray.200", "gray.700");
 
   return (
     <Flex alignItems={"center"}>
       <Menu>
-        <MenuButton transition="all 0.3s" _focus={{ boxShadow: "none" }}>
-          <HStack>
-            <Avatar size={"sm"} src={avatarSrc} />
-            <VStack
-              display={{ base: "none", md: "flex" }}
-              alignItems="flex-start"
-              spacing="1px"
-            >
-              <Text fontSize="sm">{username}</Text>
-              <Text fontSize="xs" color={emailColor}>
-                {userEmail}
-              </Text>
-            </VStack>
-            <Box display={{ base: "none", md: "flex" }}>
-              <ChevronDownIcon />
-            </Box>
-          </HStack>
-        </MenuButton>
-        <MenuList
-          bg={useColorModeValue("white", "gray.900")}
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-        >
-          {MENU_ITEMS.map((item) => {
-            return (
-              <div key={item.label}>
-                {item.withDividerTop && <MenuDivider />}
-                <MenuItem as={NextLink} href={item.href}>
-                  {item.label}
-                </MenuItem>
-              </div>
-            );
-          })}
-        </MenuList>
+        {({ isOpen }) => (
+          <>
+            <MenuButton transition="all 0.3s" _focus={{ boxShadow: "none" }}>
+              <HStack>
+                <Avatar size={"sm"} src={avatarSrc} />
+                <VStack
+                  display={{ base: "none", md: "flex" }}
+                  alignItems="flex-start"
+                  spacing="1px"
+                >
+                  <Text fontSize="sm">{username}</Text>
+                  <Text fontSize="xs" color={emailColor}>
+                    {userEmail}
+                  </Text>
+                </VStack>
+                <Box display={{ base: "none", md: "flex" }}>
+                  {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                </Box>
+              </HStack>
+            </MenuButton>
+            <MenuList bg={menuListBgColor} borderColor={menuListBorderColor}>
+              {MENU_ITEMS.map((item) => {
+                return (
+                  <div key={item.label}>
+                    {item.withDividerTop && <MenuDivider />}
+                    <MenuItem as={NextLink} href={item.href}>
+                      {item.label}
+                    </MenuItem>
+                  </div>
+                );
+              })}
+            </MenuList>
+          </>
+        )}
       </Menu>
     </Flex>
   );
