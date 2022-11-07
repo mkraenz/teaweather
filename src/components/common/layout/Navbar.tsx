@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
   Stack,
   Text,
+  Tooltip,
   useBreakpointValue,
   useColorMode,
   useColorModeValue,
@@ -271,14 +272,20 @@ const ColorModeIconButton: FC = () => {
   const { toggleColorMode, colorMode } = useColorMode();
 
   return (
-    <IconButton
-      size="md"
-      variant="ghost"
-      color={useColorModeValue("gray.500", "gray.300")}
-      aria-label="open menu"
-      icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-      onClick={toggleColorMode}
-    />
+    <Tooltip
+      label={
+        colorMode === "light" ? "Switch to dark mode" : "Switch to light mode"
+      }
+    >
+      <IconButton
+        size="md"
+        variant="ghost"
+        color={useColorModeValue("gray.500", "gray.300")}
+        aria-label="Toggle color mode"
+        icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+        onClick={toggleColorMode}
+      />
+    </Tooltip>
   );
 };
 

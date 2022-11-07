@@ -6,6 +6,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
 import type { FC, KeyboardEventHandler } from "react";
@@ -60,16 +61,18 @@ const SearchByCity: FC<Props> = ({
           onKeyDown={handleKeyDown}
         />
         <InputRightElement h="full">
-          <IconButton
-            aria-label="Search"
-            onClick={onSearch}
-            icon={icon === "search" ? <SearchIcon /> : <AddIcon />}
-            color={searchInputTextColor}
-            _hover={{
-              bg: searchButtonHoverColor,
-            }}
-            bg={searchButtonColor}
-          ></IconButton>
+          <Tooltip label={icon === "search" ? "Search" : "Add location"}>
+            <IconButton
+              aria-label={icon === "search" ? "Search" : "Add location"}
+              onClick={onSearch}
+              icon={icon === "search" ? <SearchIcon /> : <AddIcon />}
+              color={searchInputTextColor}
+              _hover={{
+                bg: searchButtonHoverColor,
+              }}
+              bg={searchButtonColor}
+            />
+          </Tooltip>
         </InputRightElement>
       </InputGroup>
     </FormControl>
