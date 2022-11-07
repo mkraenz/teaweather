@@ -52,7 +52,7 @@ aws cloudformation delete-stack --stack-name teaweather
 
 ## Authentication / Authorization
 
-- [Auth0 with Nextjs official docs](https://auth0.com/docs/quickstart/webapp/nextjs/01-log) (login to Auth0 with regular Google account)
+- [Auth0 with Nextjs official docs](https://auth0.com/docs/quickstart/webapp/nextjs/01-log) (login to Auth0 with regular Github account)
 - tenant: `teaweather`
 - application name: `nextjs`
 - [Protecting nextjs api routes](https://github.com/auth0/nextjs-auth0/blob/main/EXAMPLES.md#protect-an-api-route)
