@@ -1,8 +1,9 @@
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Button,
   HStack,
   IconButton,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,6 +12,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  Tooltip,
   useBoolean,
   useBreakpointValue,
   useColorModeValue,
@@ -18,7 +20,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import type { FC, MouseEventHandler } from "react";
+import { FC, KeyboardEventHandler, MouseEventHandler, useState } from "react";
 import type { ILocation } from "../../../api/domain/Location";
 import type { WeatherData } from "../../interfaces";
 import WeatherDetails from "./WeatherDetails";
@@ -63,15 +65,42 @@ const ConfirmDeletionModal: FC<{
   );
 };
 
+const CustomNameToolbar: FC<{
+  onConfirm: () => void;
+  onCancel: () => void;
+}> = ({ onConfirm, onCancel }) => {
+  return (
+    <VStack alignSelf={"center"}>
+      <Tooltip label="Confirm custom name">
+        <IconButton
+          icon={<CheckIcon />}
+          aria-label={"Confirm setting custom name for this location"}
+          onClick={onConfirm}
+        />
+      </Tooltip>
+      <Tooltip label="Cancel setting custom name">
+        <IconButton
+          icon={<CloseIcon />}
+          aria-label={"Cancel setting custom name for this location"}
+          onClick={onCancel}
+        />
+      </Tooltip>
+    </VStack>
+  );
+};
+
 const LocationBlock: FC<Props> = ({ weather, location }) => {
   const hoverBg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
   const deleteIconButtonHoverBg = useColorModeValue("red.300", "red.500");
-  const [deleteIconShown, { toggle: toggleDeleteIcon }] = useBoolean(false);
+  const [toolbarShown, { toggle: toggleToolbar }] = useBoolean(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [editingCustomName, { toggle: toggleEditingCustomName }] =
+    useBoolean(false);
   const toolbarHiddenOnMobile = useBreakpointValue(
     { base: true, md: false },
     { fallback: "md" }
   );
+  const [customName, setCustomName] = useState(location.customName || "");
 
   const openDeleteConfirmation: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -91,7 +120,38 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
     onClose();
   };
   const editLocation = () => {
-    alert("Feature coming soon");
+    if (editingCustomName) {
+      return;
+    }
+    toggleEditingCustomName();
+  };
+  const confirmCustomName = async () => {
+    // TODO global state management
+    // TODO add endpoint
+    const res = await fetch(`/api/locations/${location.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ customName, id: location.id }),
+    });
+    if (res.ok) {
+      alert(
+        // TODO Change text to: Custom name set successfully. Refresh the page to see the changes. Improved workflow coming soon.
+        "Feature coming soon."
+      );
+    } else {
+      // TODO handle error
+    }
+    toggleEditingCustomName();
+  };
+
+  const cancelCustomNameEdit = () => {
+    toggleEditingCustomName();
+    setCustomName(location.customName || "");
+  };
+
+  const handleKeyDownOnCustomNameInput: KeyboardEventHandler<
+    HTMLInputElement
+  > = (event) => {
+    if (event.key === "Enter") confirmCustomName();
   };
 
   const locationName =
@@ -109,15 +169,14 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
         location={locationName}
       />
       <HStack
-        position={"relative"} // for the delete icon
         padding={{ base: 0, md: 4 }}
         gap={6}
         alignItems={"flex-start"}
         _hover={{
           bg: hoverBg,
         }}
-        onMouseOver={toggleDeleteIcon}
-        onMouseOut={toggleDeleteIcon}
+        onMouseOver={toggleToolbar}
+        onMouseOut={toggleToolbar}
         rounded="xl"
       >
         <WeatherIcon
@@ -126,9 +185,18 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
         />
         <WeatherDetails {...weather} />
         <VStack alignItems={"flex-end"} pr={4}>
-          <Text as="h3" fontSize={"2xl"}>
-            {locationName}
-          </Text>
+          {editingCustomName ? (
+            <Input
+              autoFocus
+              placeholder="Insert custom name..."
+              onChange={(e) => setCustomName(e.currentTarget.value)}
+              onKeyDown={handleKeyDownOnCustomNameInput}
+            />
+          ) : (
+            <Text as="h3" fontSize={"2xl"}>
+              {locationName}
+            </Text>
+          )}
           <Text>
             {new Date(weather.time).toLocaleString("en-US", {
               dateStyle: "short",
@@ -138,21 +206,32 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
           <Text fontSize={"lg"}>{weather.description}</Text>
         </VStack>
         {/* TODO mobile support */}
-        <VStack alignSelf={"center"} hidden={toolbarHiddenOnMobile}>
-          <IconButton
-            icon={<EditIcon />}
-            aria-label={"Edit this location"}
-            visibility={deleteIconShown ? "visible" : "hidden"}
-            onClick={editLocation}
+        {editingCustomName ? (
+          <CustomNameToolbar
+            onCancel={cancelCustomNameEdit}
+            onConfirm={confirmCustomName}
           />
-          <IconButton
-            icon={<DeleteIcon />}
-            aria-label={`delete the location ${location}. Opens a confirmation modal.`}
-            _hover={{ bg: deleteIconButtonHoverBg }}
-            onClick={openDeleteConfirmation}
-            visibility={deleteIconShown ? "visible" : "hidden"}
-          />
-        </VStack>
+        ) : (
+          <VStack alignSelf={"center"} hidden={toolbarHiddenOnMobile}>
+            <Tooltip label="Set custom name">
+              <IconButton
+                icon={<EditIcon />}
+                aria-label={"Edit this location"}
+                visibility={toolbarShown ? "visible" : "hidden"}
+                onClick={editLocation}
+              />
+            </Tooltip>
+            <Tooltip label="Delete location">
+              <IconButton
+                icon={<DeleteIcon />}
+                aria-label={`delete the location ${location}. Opens a confirmation modal.`}
+                _hover={{ bg: deleteIconButtonHoverBg }}
+                onClick={openDeleteConfirmation}
+                visibility={toolbarShown ? "visible" : "hidden"}
+              />
+            </Tooltip>
+          </VStack>
+        )}
       </HStack>
     </NextLink>
   );
