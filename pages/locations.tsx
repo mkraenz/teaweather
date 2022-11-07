@@ -10,7 +10,6 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import type { ILocation } from "../src/api/domain/Location";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import type { ApiData, ApiData2 } from "../src/api/types";
@@ -19,8 +18,12 @@ import { colorWorkaroundGetServerSideProps } from "../src/components/common/layo
 import SignInButton from "../src/components/common/layout/SignInButton";
 import SignUpButton from "../src/components/common/layout/SignUpButton";
 import SearchByCity from "../src/components/common/SearchByCity";
-import LocationBlock from "../src/components/common/weather/LocationBlock";
-import type { WeatherData } from "../src/components/interfaces";
+import LocationBlock from "../src/components/locations/LocationBlock";
+import {
+  LocationsStateProvider,
+  useLocations,
+  WeatherLocation,
+} from "../src/components/locations/locations-state";
 import type { LocationsHandlerType } from "./api/locations/[[...params]]";
 import type weatherCurrent from "./api/weather-current";
 import type { MyGetServerSideProps } from "./_app";
@@ -60,34 +63,39 @@ const UnauthenticatedLocations = () => (
 );
 
 interface Props {
-  locations: { location: ILocation; weather: WeatherData }[];
+  locations: WeatherLocation[];
 }
 
-const Locations: NextPage<Props> = (props) => {
-  const [locations, setLocations] = useState(props.locations);
+const Locations = () => {
+  const { state, dispatch, allLocations } = useLocations();
   const [locationSearch, setLocationSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
 
-  useEffect(
-    () => {
-      // intentionally unawaited
-      locations.forEach(async (loc) => {
-        const res = await fetch(
-          `/api/weather-current?lat=${loc.location.lat}&lon=${loc.location.lon}`
-        );
-        const weatherRes: ApiData<typeof weatherCurrent> = await res.json();
-        // wow this code is terrible. I wish i'd be using some state management library
-        setLocations((prev) => {
-          const newLocations = [...prev];
-          const l = newLocations.find((x) => x.location.id === loc.location.id);
-          if (l) l.weather = weatherRes.weather;
-          return newLocations;
+  const locations = allLocations;
+  useEffect(() => {
+    // intentionally unawaited
+    locations.forEach(async (loc) => {
+      dispatch({ type: "fetch-weather", id: loc.location.id });
+      const res = await fetch(
+        `/api/weather-current?lat=${loc.location.lat}&lon=${loc.location.lon}`
+      );
+      if (!res.ok) {
+        dispatch({
+          type: "fetch-weather-failed",
+          id: loc.location.id,
+          error: res.statusText,
         });
+        return;
+      }
+      const weatherRes: ApiData<typeof weatherCurrent> = await res.json();
+      dispatch({
+        type: "set-weather",
+        id: loc.location.id,
+        weather: weatherRes.weather,
       });
-    },
-    locations.map((l) => l.location.id)
-  );
+    });
+  }, [...locations.map((l) => l.location.id)]);
 
   const addLocation = async () => {
     if (!locationSearch) return;
@@ -116,11 +124,7 @@ const Locations: NextPage<Props> = (props) => {
       return;
     }
     const data: ApiData2<LocationsHandlerType["add"]> = await res.json();
-    setLocations([
-      // newest location first
-      { weather: data.weather, location: data.location },
-      ...locations,
-    ]);
+    dispatch({ type: "add", location: { ...data } });
     setLoading(false);
   };
 
@@ -138,6 +142,11 @@ const Locations: NextPage<Props> = (props) => {
           icon="add"
         />
         <Wrap spacing={8} justify={"center"}>
+          {(locations || []).map(({ location, weather }, i) => (
+            <WrapItem key={i}>
+              <LocationBlock weather={weather} location={location} />
+            </WrapItem>
+          ))}
           {loading && (
             <Skeleton
               height={135}
@@ -145,14 +154,17 @@ const Locations: NextPage<Props> = (props) => {
               width={{ base: "full", md: 500 }}
             />
           )}
-          {(locations || props.locations).map(({ location, weather }, i) => (
-            <WrapItem key={i}>
-              <LocationBlock weather={weather} location={location} />
-            </WrapItem>
-          ))}
         </Wrap>
       </VStack>
     </>
+  );
+};
+
+const LocationsPage: NextPage<Props> = ({ locations }) => {
+  return (
+    <LocationsStateProvider initialLocations={locations}>
+      <Locations />
+    </LocationsStateProvider>
   );
 };
 
@@ -171,6 +183,7 @@ const _getServerSideProps: MyGetServerSideProps<Props> = async (context) => {
     const json: ApiData2<LocationsHandlerType["find"]> = await res.json();
     locations = json.locations.map((location) => ({
       location,
+      loading: false,
       weather: {
         description: "Loading...",
         icon: "01d",
@@ -207,4 +220,4 @@ const _getServerSideProps: MyGetServerSideProps<Props> = async (context) => {
 export const getServerSideProps =
   getServerSidePropsWrapper(_getServerSideProps);
 
-export default Locations;
+export default LocationsPage;

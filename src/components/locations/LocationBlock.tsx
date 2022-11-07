@@ -21,10 +21,11 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { FC, KeyboardEventHandler, MouseEventHandler, useState } from "react";
-import type { ILocation } from "../../../api/domain/Location";
-import type { WeatherData } from "../../interfaces";
-import WeatherDetails from "./WeatherDetails";
-import WeatherIcon from "./WeatherIcon";
+import type { ILocation } from "../../api/domain/Location";
+import WeatherDetails from "../common/weather/WeatherDetails";
+import WeatherIcon from "../common/weather/WeatherIcon";
+import type { WeatherData } from "../interfaces";
+import { useLocations } from "./locations-state";
 
 interface Props {
   weather: WeatherData;
@@ -90,6 +91,7 @@ const CustomNameToolbar: FC<{
 };
 
 const LocationBlock: FC<Props> = ({ weather, location }) => {
+  const { dispatch } = useLocations();
   const hoverBg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
   const deleteIconButtonHoverBg = useColorModeValue("red.300", "red.500");
   const [toolbarShown, { toggle: toggleToolbar }] = useBoolean(false);
@@ -113,9 +115,9 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
       method: "DELETE",
     });
     if (res.ok) {
-      alert(
-        "Location deleted. Refresh the page to see the changes. Improved workflow coming soon."
-      );
+      dispatch({ type: "remove", id: location.id });
+    } else {
+      // TODO error handling
     }
     onClose();
   };
@@ -135,9 +137,7 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
       body: JSON.stringify({ customName }),
     });
     if (res.ok) {
-      alert(
-        "Custom name set successfully. Refresh the page to see the changes. Improved workflow coming soon."
-      );
+      dispatch({ type: "set-custom-name", id: location.id, customName });
     } else {
       // TODO handle error
     }
@@ -199,12 +199,6 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
               {locationName}
             </Text>
           )}
-          <Text>
-            {new Date(weather.time).toLocaleString("en-US", {
-              dateStyle: "short",
-              timeStyle: "short",
-            })}
-          </Text>
           <Text fontSize={"lg"}>{weather.description}</Text>
         </VStack>
         {/* TODO mobile support */}
