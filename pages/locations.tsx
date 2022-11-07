@@ -102,7 +102,7 @@ const Locations = () => {
     setLoading(true);
     const city = locationSearch.split(",")[0].trim();
     const countryCode = (
-      locationSearch.split(",")[1].trim() || "DE"
+      locationSearch.split(",")[1]?.trim() || "DE"
     ).toUpperCase();
     const type = "city";
     const res = await fetch("/api/locations", {
