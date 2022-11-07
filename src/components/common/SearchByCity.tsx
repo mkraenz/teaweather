@@ -24,8 +24,8 @@ const SearchByCity: FC<Props> = ({
   icon = "search",
 }) => {
   const searchInputTextColor = useColorModeValue("gray.600", "gray.300");
-  const searchButtonColor = useColorModeValue("cyan.300", "blue.700");
-  const searchButtonHoverColor = useColorModeValue("cyan.200", "blue.800");
+  const searchButtonColor = useColorModeValue("cyan.200", "blue.700");
+  const searchButtonHoverColor = useColorModeValue("cyan.100", "blue.800");
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (event) => {
     if (event.key === "Enter") {
@@ -59,9 +59,8 @@ const SearchByCity: FC<Props> = ({
           onChange={(e) => onInput(e.currentTarget.value)}
           onKeyDown={handleKeyDown}
         />
-        <InputRightElement>
+        <InputRightElement h="full">
           <IconButton
-            size="md"
             aria-label="Search"
             onClick={onSearch}
             icon={icon === "search" ? <SearchIcon /> : <AddIcon />}
