@@ -105,6 +105,8 @@ const Locations: NextPage<Props> = (props) => {
       body: JSON.stringify({ city, countryCode, type }),
     });
     if (!res.ok) {
+      if (res.status === 422) alert("You can only track up to 30 locations.");
+
       // TODO handle error
       console.error("Error while adding location", res.status, {
         city,

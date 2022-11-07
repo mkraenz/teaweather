@@ -12,6 +12,7 @@ import {
   Post,
   Req,
   Res,
+  UnprocessableEntityException,
 } from "next-api-decorators";
 import UserRepository from "../../../src/api/db/user-repository";
 import { Location } from "../../../src/api/domain/Location";
@@ -70,7 +71,16 @@ class LocationsHandler {
     const user = getUser(req, res);
     const id = user.sub;
 
-    await this.users.upsertAndPrependLocation(id, loc);
+    try {
+      await this.users.upsertAndPrependLocation(id, loc);
+    } catch (error) {
+      const e = error as Error;
+      if (e.message === "You can only have 30 locations") {
+        throw new UnprocessableEntityException(
+          "You can only have up to 30 locations."
+        );
+      }
+    }
 
     const weather = await getCurrentWeather(
       loc.toLongLocation(),

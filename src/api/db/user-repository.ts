@@ -23,6 +23,9 @@ export class UserRepository {
   async upsertAndPrependLocation(userId: string, loc: Location) {
     const existingUser = await this.get(userId);
     if (existingUser) {
+      if (existingUser.locations.length > 30) {
+        throw new Error("You can only have 30 locations");
+      }
       await this.upsert({
         id: userId,
         locations: [loc.toJSON(), ...existingUser.locations],
