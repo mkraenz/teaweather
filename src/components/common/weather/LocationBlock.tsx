@@ -127,15 +127,16 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
   };
   const confirmCustomName = async () => {
     // TODO global state management
-    // TODO add endpoint
     const res = await fetch(`/api/locations/${location.id}`, {
       method: "PATCH",
-      body: JSON.stringify({ customName, id: location.id }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ customName }),
     });
     if (res.ok) {
       alert(
-        // TODO Change text to: Custom name set successfully. Refresh the page to see the changes. Improved workflow coming soon.
-        "Feature coming soon."
+        "Custom name set successfully. Refresh the page to see the changes. Improved workflow coming soon."
       );
     } else {
       // TODO handle error
@@ -188,6 +189,7 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
           {editingCustomName ? (
             <Input
               autoFocus
+              value={customName}
               placeholder="Insert custom name..."
               onChange={(e) => setCustomName(e.currentTarget.value)}
               onKeyDown={handleKeyDownOnCustomNameInput}

@@ -8,6 +8,7 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -19,6 +20,7 @@ import getCurrentWeather from "../../../src/api/get-current-weather";
 import getLocation from "../../../src/api/get-location";
 import getUser from "../../../src/api/get-user";
 import { AddLocationDto } from "../../../src/api/locations/add-location.input.dto";
+import { UpdateLocationDto } from "../../../src/api/locations/update-location.dto";
 import { ZodValidationPipe } from "../utils/ZodValidationPipe";
 
 const log = (message: string, obj?: any) => {
@@ -90,15 +92,43 @@ class LocationsHandler {
     const user = getUser(req, res);
     const userId = user.sub;
     const existingUser = await this.users.get(userId);
-    if (!existingUser) return;
+    if (!existingUser) throw new NotFoundException("User in DB not found"); // can happen if user only exists in auth0 but not in dynamodb. Though it's weird that the user calls this endpoint if he doesn't have any locations.
 
     await this.users.removeLocation(userId, id);
+  }
+
+  @Patch("/:id")
+  public async updateLocation(
+    @Req() req: NextApiRequest,
+    @Res() res: NextApiResponse,
+    @Param("id") id: string,
+    @Body(ZodValidationPipe(UpdateLocationDto)) body: UpdateLocationDto
+  ) {
+    const x = 5;
+    console.log(x);
+    const user = getUser(req, res);
+    const userId = user.sub;
+    const existingUser = await this.users.get(userId);
+    if (!existingUser) throw new NotFoundException("User in DB not found"); // can happen if user only exists in auth0 but not in dynamodb. Though it's weird that the user calls this endpoint if he doesn't have any locations.
+
+    const location = existingUser.locations.find((l) => l.id === id);
+    if (!location) throw new NotFoundException("Location not found");
+
+    const updatedLocation = new Location(location);
+    if (body.customName !== undefined)
+      updatedLocation.customName = body.customName || null; // null in order to delete customName if it's an empty string
+    const newLocations = existingUser.locations.map((l) =>
+      l.id === id ? updatedLocation.toJSON() : l
+    );
+    existingUser.locations = newLocations;
+    await this.users.upsert(existingUser);
   }
 
   private async getLocationFromInput(body: AddLocationDto) {
     let location: { longitude: number; latitude: number };
     if ("city" in body && "countryCode" in body) {
       log("found city input. getting location from city...");
+      // TODO refactor: move this into the Location class?
       location = await getLocation(
         Env.openWeatherApiKey,
         body.city,
