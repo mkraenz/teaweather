@@ -3,13 +3,14 @@ import {
   Skeleton,
   Stack,
   Text,
+  useBreakpointValue,
   VStack,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import type { ApiData, ApiData2 } from "../src/api/types";
@@ -24,6 +25,7 @@ import {
   useLocations,
   WeatherLocation,
 } from "../src/components/locations/locations-state";
+import MobileLocationBlock from "../src/components/locations/MobileLocationBlock";
 import type { LocationsHandlerType } from "./api/locations/[[...params]]";
 import type weatherCurrent from "./api/weather-current";
 import type { MyGetServerSideProps } from "./_app";
@@ -66,11 +68,16 @@ interface Props {
   locations: WeatherLocation[];
 }
 
-const Locations = () => {
-  const { state, dispatch, allLocations } = useLocations();
+const Locations: FC = () => {
+  const { dispatch, allLocations } = useLocations();
   const [locationSearch, setLocationSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
+  // TODO SSR
+  const isOnMobile = useBreakpointValue(
+    { base: true, md: false },
+    { fallback: "md" }
+  );
 
   const locations = allLocations;
   useEffect(() => {
@@ -95,7 +102,7 @@ const Locations = () => {
         weather: weatherRes.weather,
       });
     });
-  }, [...locations.map((l) => l.location.id)]);
+  }, []); // only run once. when adding locations, the weather is delivered with the new location
 
   const addLocation = async () => {
     if (!locationSearch) return;
@@ -129,6 +136,15 @@ const Locations = () => {
   };
 
   if (!user) return <UnauthenticatedLocations />;
+  if (isOnMobile)
+    return (
+      <MobileLocations
+        loading={loading}
+        locations={locations}
+        setLocationSearch={setLocationSearch}
+        addLocation={addLocation}
+      />
+    );
 
   return (
     <>
@@ -145,6 +161,42 @@ const Locations = () => {
           {(locations || []).map(({ location, weather }, i) => (
             <WrapItem key={i}>
               <LocationBlock weather={weather} location={location} />
+            </WrapItem>
+          ))}
+          {loading && (
+            <Skeleton
+              height={135}
+              rounded="xl"
+              width={{ base: "full", md: 500 }}
+            />
+          )}
+        </Wrap>
+      </VStack>
+    </>
+  );
+};
+
+const MobileLocations: FC<{
+  locations: WeatherLocation[];
+  setLocationSearch: (value: string) => void;
+  addLocation: () => void;
+  loading: boolean;
+}> = ({ locations, setLocationSearch, addLocation, loading }) => {
+  return (
+    <>
+      <PageHead />
+      <VStack justifyContent={"center"} gap={{ base: 8, md: 16 }} pt={16}>
+        <Heading2 as="h1" text={`my locations`} textTransform="capitalize" />
+        <SearchByCity
+          onInput={setLocationSearch}
+          onSearch={addLocation}
+          label="Track a new location"
+          icon="add"
+        />
+        <Wrap spacing={8} justify={"center"}>
+          {(locations || []).map(({ location, weather }, i) => (
+            <WrapItem key={i}>
+              <MobileLocationBlock weather={weather} location={location} />
             </WrapItem>
           ))}
           {loading && (
