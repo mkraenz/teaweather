@@ -94,7 +94,8 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
   const { dispatch } = useLocations();
   const hoverBg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
   const deleteIconButtonHoverBg = useColorModeValue("red.300", "red.500");
-  const [toolbarShown, { toggle: toggleToolbar }] = useBoolean(false);
+  const [toolbarShown, { on: showToolbar, off: hideToolbar }] =
+    useBoolean(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editingCustomName, { toggle: toggleEditingCustomName }] =
     useBoolean(false);
@@ -176,8 +177,8 @@ const LocationBlock: FC<Props> = ({ weather, location }) => {
         _hover={{
           bg: hoverBg,
         }}
-        onMouseOver={toggleToolbar}
-        onMouseOut={toggleToolbar}
+        onMouseOver={showToolbar}
+        onMouseOut={hideToolbar}
         rounded="xl"
       >
         <WeatherIcon
