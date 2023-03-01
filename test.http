@@ -1,20 +1,10 @@
 # set via vscode settings.json -> "rest-client.environmentVariables"
 # also ctrl shift P -> rest client: switch environment -> local
 @openweathermapapikey = {{teaweatheropenweatherapikey}}
-@awsapikey = {{teaweatherawsapikey}}
-@awsapigwId = {{teaweatherawsapigwId}}
+@arcgisapikey = {{teaweatherarcgisapikey}}
+
+### 
 GET https://api.openweathermap.org/data/2.5/forecast?lat=51.5072&lon=-0.11&appid={{openweathermapapikey}}
 
-###
-POST https://{{awsapigwId}}.execute-api.us-east-1.amazonaws.com/prod/users
-Content-Type: application/json
-x-api-key: {{awsapikey}}
-
-{
-    "userId": "testuserid2",
-    "locations": [{ "city": "Petersburg", "countryCode": "US", "lat": 37.2279, "lon": -77.4019 }]
-}
-
-###
-GET https://{{awsapigwId}}.execute-api.us-east-1.amazonaws.com/prod/users/testuserid3
-x-api-key: {{awsapikey}}
+############# ARCGIS ##############
+GET https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?address=trafalgar+square&outFields=*&f=json&token={{arcgisapikey}}
