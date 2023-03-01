@@ -68,3 +68,10 @@ aws cloudformation delete-stack --stack-name teaweather
 - tenant: `teaweather`
 - application name: `nextjs`
 - [Protecting nextjs api routes](https://github.com/auth0/nextjs-auth0/blob/main/EXAMPLES.md#protect-an-api-route)
+
+## Address Lookup with ArcGIS
+
+- [arcgis dashboard (login required)](https://developers.arcgis.com/dashboard/#)
+- [arcgis GeoCoding API](https://developers.arcgis.com/documentation/mapping-apis-and-services/search/geocoding/)
+- [arcgis search api](https://developers.arcgis.com/documentation/mapping-apis-and-services/search/)
+- [arcgis guide: search for an address](https://developers.arcgis.com/javascript/latest/search-for-an-address/)
