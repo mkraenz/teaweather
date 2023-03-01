@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "AWS CloudFormation template that defines necessary metadata, creates a dynamodb instance and an api gateway with an api key to allow external access to the dynamodb instance"
+Description: "AWS CloudFormation template that defines necessary metadata, creates a dynamodb table and an IAM User with an access key to allow our NextJS API Routes (i.e. serverless functions) to talk to the dynamodb table."
 
 Resources:
   DbTable:
