@@ -7,4 +7,7 @@
 GET https://api.openweathermap.org/data/2.5/forecast?lat=51.5072&lon=-0.11&appid={{openweathermapapikey}}
 
 ############# ARCGIS ##############
-GET https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?address=trafalgar+square&outFields=*&f=json&token={{arcgisapikey}}
+### geocoding with all fields
+GET https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?address=trafalgra+square&outFields=*&f=json&token={{arcgisapikey}}
+### with only specific fields
+GET https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?address=trafalgra+square&outFields=Type,Place_addr,PlaceName,Country,CntryName&f=json&token={{arcgisapikey}}
