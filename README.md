@@ -2,7 +2,17 @@
 
 ## Getting Started
 
-First, run the development server:
+Deploy the AWS resources. See [Deploy AWS resources](#deploy-aws-resources).
+
+Create a `.env.local` file in the root of the project:
+
+```bash
+cp .env.sample .env.local
+```
+
+Then, fill in the values for the environment variables, some come from the AWS Resources you just deployed, others from external SAAS providers like OpenWeather API.
+
+Next, run the development server:
 
 ```bash
 npm run dev
@@ -22,7 +32,9 @@ Simply push to `main` branch to automatically trigger a deployment on Vercel.
 
 ## Deploy AWS resources
 
-from repository root, run
+This requires the [AWS CLI](https://aws.amazon.com/cli/) to be installed and configured.
+
+From repository root, run
 
 ```sh
 # first time only
@@ -31,7 +43,7 @@ aws cloudformation create-stack --stack-name teaweather --template-body file://c
 # update stack
 aws cloudformation update-stack --stack-name teaweather --template-body file://cloudformation-template.yaml --capabilities CAPABILITY_NAMED_IAM | jq .StackId
 
-# describe stack
+# describe stack to get stack id, api gateway id and api key id+secret
 STACK_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq '.Stacks[0].StackId')
 
 API_GATEWAY_KEY_ID=$(aws cloudformation describe-stacks --stack-name teaweather | jq '.Stacks[0].Outputs' | jq -r ' map(select(.OutputKey == "ApiKey"))[0].OutputValue')
