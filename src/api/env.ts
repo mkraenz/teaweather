@@ -5,6 +5,7 @@ export const Env = {
   awsAccessKeyId: process.env.TEAWEATHER_AWS_ACCESS_KEY_ID!,
   awsSecretAccessKey: process.env.TEAWEATHER_AWS_SECRET_ACCESS_KEY!,
   awsDynamoDbTableName: process.env.TEAWEATHER_AWS_DYNAMODB_TABLE_NAME!,
+  arcgisApiKey: process.env.ARCGIS_API_KEY!,
 };
 
 const assertEnv = () => {

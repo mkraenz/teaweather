@@ -1,5 +1,5 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import { VStack } from "@chakra-ui/react";
+import { Button, VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -45,6 +45,12 @@ const Home: NextPage<Props> = (props) => {
     if (data) setWeather(data?.weather);
   }, [data]);
 
+  const fetchAddress = async () => {
+    const res = await fetch("/api/address?address=Trafalgar+Square");
+    const data = await res.json();
+    console.log(data);
+  };
+
   return (
     <>
       <Head>
@@ -64,6 +70,7 @@ const Home: NextPage<Props> = (props) => {
         <Heading2 text="Find the perfect weather for your afternoon tea." />
         <WeatherBlock weather={weather} withLocation />
         <SearchByCity onInput={setLocationSearch} onSearch={searchByLocation} />
+        <Button onClick={fetchAddress}>Fetch Address</Button>
       </VStack>
     </>
   );
