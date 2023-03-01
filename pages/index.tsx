@@ -1,19 +1,21 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import { Button, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
-import type { ApiData } from "../src/api/types";
+import type { ApiData, ApiData2 } from "../src/api/types";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
+import SearchByAddress from "../src/components/common/SearchByAddress";
 import SearchByCity from "../src/components/common/SearchByCity";
 import useGeolocationBasedWeather from "../src/components/common/use-geolocation-based-weather.hook";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
 import type { WeatherData } from "../src/components/interfaces";
+import type { AddressHandlerType } from "./api/address/[[...params]]";
 import type weatherCurrentApi from "./api/weather-current";
 import type { MyGetServerSideProps } from "./_app";
 
@@ -23,7 +25,9 @@ interface Props {
 
 const Home: NextPage<Props> = (props) => {
   const [weather, setWeather] = useState(props.weather);
+  const [addresses, setAddresses] = useState<any[]>([]); // TODO fix type
   const [locationSearch, setLocationSearch] = useState("");
+  const [addressSearch, setAddressSearch] = useState("");
   const searchByLocation = async () => {
     if (!locationSearch) return;
     const city = encodeURIComponent(locationSearch.split(",")[0]);
@@ -45,10 +49,22 @@ const Home: NextPage<Props> = (props) => {
     if (data) setWeather(data?.weather);
   }, [data]);
 
-  const fetchAddress = async () => {
-    const res = await fetch("/api/address?address=Trafalgar+Square");
-    const data = await res.json();
-    console.log(data);
+  const searchByAddress = async () => {
+    const res = await fetch(`/api/address?address=${addressSearch}`);
+    const data: ApiData2<AddressHandlerType["find"]> = await res.json();
+    setAddresses(data.candidates);
+
+    if (!data.candidates.length) return;
+    const location = data.candidates[0].location;
+    const weatherRes = await fetch(
+      `/api/weather-current?lat=${location.y}&lon=${location.x}`
+    );
+    if (!weatherRes.ok) {
+      // TODO handle error
+    }
+    const weatherData: ApiData<typeof weatherCurrentApi> =
+      await weatherRes.json();
+    setWeather(weatherData.weather);
   };
 
   return (
@@ -70,7 +86,10 @@ const Home: NextPage<Props> = (props) => {
         <Heading2 text="Find the perfect weather for your afternoon tea." />
         <WeatherBlock weather={weather} withLocation />
         <SearchByCity onInput={setLocationSearch} onSearch={searchByLocation} />
-        <Button onClick={fetchAddress}>Fetch Address</Button>
+        <SearchByAddress
+          onInput={setAddressSearch}
+          onSearch={searchByAddress}
+        />
       </VStack>
     </>
   );
