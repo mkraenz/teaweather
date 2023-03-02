@@ -20,7 +20,7 @@ interface Props {
 const SearchByAddress: FC<Props> = ({
   onInput,
   onSearch,
-  label = "Search by address",
+  label = "Search by Address",
 }) => {
   const searchInputTextColor = useColorModeValue("gray.600", "gray.300");
   const searchButtonColor = useColorModeValue("cyan.200", "blue.700");

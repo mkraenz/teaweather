@@ -10,7 +10,6 @@ import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import SearchByAddress from "../src/components/common/SearchByAddress";
-import SearchByCity from "../src/components/common/SearchByCity";
 import useGeolocationBasedWeather from "../src/components/common/use-geolocation-based-weather.hook";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
@@ -19,28 +18,17 @@ import type { AddressHandlerType } from "./api/address/[[...params]]";
 import type weatherCurrentApi from "./api/weather-current";
 import type { MyGetServerSideProps } from "./_app";
 
+type AddressLookupResponse = ApiData2<AddressHandlerType["find"]>;
+type Address = AddressLookupResponse["candidates"][number];
+
 interface Props {
   weather: WeatherData;
 }
 
 const Home: NextPage<Props> = (props) => {
   const [weather, setWeather] = useState(props.weather);
-  const [addresses, setAddresses] = useState<any[]>([]); // TODO fix type
-  const [locationSearch, setLocationSearch] = useState("");
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressSearch, setAddressSearch] = useState("");
-  const searchByLocation = async () => {
-    if (!locationSearch) return;
-    const city = encodeURIComponent(locationSearch.split(",")[0]);
-    const country = encodeURIComponent(locationSearch.split(", ")[1] || "de");
-    const res = await fetch(
-      `/api/weather-current?city=${city}&countryCode=${country}`
-    );
-    if (!res.ok) {
-      // TODO handle error
-    }
-    const data: ApiData<typeof weatherCurrentApi> = await res.json();
-    setWeather(data.weather);
-  };
 
   const { data, loading, error } = useGeolocationBasedWeather<
     ApiData<typeof weatherCurrentApi>
@@ -51,7 +39,7 @@ const Home: NextPage<Props> = (props) => {
 
   const searchByAddress = async () => {
     const res = await fetch(`/api/address?address=${addressSearch}`);
-    const data: ApiData2<AddressHandlerType["find"]> = await res.json();
+    const data: AddressLookupResponse = await res.json();
     setAddresses(data.candidates);
 
     if (!data.candidates.length) return;
@@ -85,7 +73,6 @@ const Home: NextPage<Props> = (props) => {
         <Heading1 text="TeaWeather" />
         <Heading2 text="Find the perfect weather for your afternoon tea." />
         <WeatherBlock weather={weather} withLocation />
-        <SearchByCity onInput={setLocationSearch} onSearch={searchByLocation} />
         <SearchByAddress
           onInput={setAddressSearch}
           onSearch={searchByAddress}
