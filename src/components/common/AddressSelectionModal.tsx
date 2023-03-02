@@ -18,7 +18,7 @@ import {
   Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Address = {
   address: string;
@@ -98,6 +98,11 @@ const AddressSelectionModal = ({
     setLimit(initialLimit);
     onClose();
   };
+  useEffect(() => {
+    // workaround: when searching more than once, the `selected` state got preserved. this forces a reset to the newest search result
+    select(initialSelectedAddress);
+  }, [initialSelectedAddress]);
+
   const handleClose = () => {
     select(initialSelectedAddress);
     setLimit(initialLimit);
