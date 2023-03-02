@@ -1,3 +1,4 @@
+import { uniqBy } from "lodash";
 import {
   createHandler,
   Get,
@@ -78,7 +79,12 @@ class AddressHandler {
         "Upstream API returned invalid data."
       );
     }
-    return validator.data;
+
+    const toKey = (address: { location: { x: number; y: number } }) =>
+      `${address.location.x},${address.location.y}`;
+    // the API sometimes returns candidates with identical location. filtering them out
+    const uniqueCandidates = uniqBy(validator.data.candidates, toKey);
+    return { candidates: uniqueCandidates };
   }
 }
 
