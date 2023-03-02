@@ -46,9 +46,7 @@ const AddressListItem = ({
 }) => {
   const accentColor = useColorModeValue("cyan.500", "cyan.400");
 
-  const bg =
-    // TODO color + dark/light mode
-    isSelected ? accentColor : undefined;
+  const bg = isSelected ? accentColor : undefined;
   return (
     <>
       <ListItem onClick={() => onSelect(address)} display={"flex"}>
