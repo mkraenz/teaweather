@@ -20,7 +20,7 @@ interface Props {
 const SearchByAddress: FC<Props> = ({
   onInput,
   onSearch,
-  label = "Search by Address",
+  label = "Search by address",
 }) => {
   const searchInputTextColor = useColorModeValue("gray.600", "gray.300");
   const searchButtonColor = useColorModeValue("cyan.200", "blue.700");
@@ -59,9 +59,9 @@ const SearchByAddress: FC<Props> = ({
           onKeyDown={handleKeyDown}
         />
         <InputRightElement h="full">
-          <Tooltip label={"Search by Address"}>
+          <Tooltip label={"Search by address"}>
             <IconButton
-              aria-label={"Search by Address"}
+              aria-label={"Search by address"}
               onClick={onSearch}
               icon={<SearchIcon />}
               color={searchInputTextColor}
