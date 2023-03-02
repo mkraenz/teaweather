@@ -1,12 +1,5 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import {
-  Button,
-  HStack,
-  Text,
-  useDisclosure,
-  useToast,
-  VStack,
-} from "@chakra-ui/react";
+import { useToast, VStack } from "@chakra-ui/react";
 import { isEmpty } from "lodash";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -14,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import type { ApiData, ApiData2 } from "../src/api/types";
-import AddressSelectionModal from "../src/components/common/AddressSelectionModal";
+import AddressSearchInfo from "../src/components/common/AddressSearchInfo";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
@@ -34,19 +27,12 @@ interface Props {
   weather: WeatherData;
 }
 
-/** @example Coffee Shop - Trafalgar, 15 Trafalgar Street, Consett, County Durham, England, DH8 5, United Kingdom */
-const formatAddress = (address: Address) => {
-  const { PlaceName, Type, Place_addr, CntryName } = address.attributes;
-  return `${Type} - ${PlaceName}, ${Place_addr}, ${CntryName}`;
-};
-
 const Home: NextPage<Props> = (props) => {
   const [weather, setWeather] = useState(props.weather);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, selectAddress] = useState<Address | null>(null);
   const [addressSearch, setAddressSearch] = useState("");
   const toast = useToast();
-  const { isOpen, onToggle, onClose } = useDisclosure();
 
   const notifyUserOfError = () =>
     toast({
@@ -117,31 +103,15 @@ const Home: NextPage<Props> = (props) => {
           onSearch={searchByAddress}
         />
         {selectedAddress && (
-          <VStack pl={4} pr={4}>
-            <Text>Showing weather for</Text>
-            <Text textAlign={"center"}>{formatAddress(selectedAddress)}</Text>
-            {addresses.length > 1 && (
-              <HStack>
-                <Text>Not the right address?</Text>
-                <Button variant={"ghost"} onClick={onToggle}>
-                  Change address ({addresses.length - 1} more)
-                </Button>
-
-                {/* modal it is rendered in a Portal, thus can be put anywhere */}
-                <AddressSelectionModal
-                  isOpen={isOpen}
-                  onClose={onClose}
-                  addresses={addresses}
-                  initialSelectedAddress={selectedAddress}
-                  onConfirm={async (address) => {
-                    selectAddress(address);
-                    const location = address.location;
-                    await refetchWeather(location.y, location.x);
-                  }}
-                />
-              </HStack>
-            )}
-          </VStack>
+          <AddressSearchInfo
+            addresses={addresses}
+            selectedAddress={selectedAddress}
+            onChangeAddress={async (address) => {
+              selectAddress(address);
+              const location = address.location;
+              await refetchWeather(location.y, location.x);
+            }}
+          />
         )}
       </VStack>
     </>

@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-type Address = {
+export type Address = {
   address: string;
   location: {
     x: number;
