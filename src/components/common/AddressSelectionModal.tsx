@@ -109,6 +109,9 @@ const AddressSelectionModal = ({
     onClose();
   };
   const initialSelectedKey = toKey(initialSelectedAddress);
+  const additionalAddresses = addresses
+    .slice(0, limit)
+    .filter((a) => initialSelectedKey !== toKey(a));
   return (
     <>
       <Modal isOpen={isOpen} onClose={handleClose}>
@@ -124,37 +127,40 @@ const AddressSelectionModal = ({
                 onSelect={select}
                 address={initialSelectedAddress}
               />
-              {addresses
-                .slice(0, limit)
-                .filter((a) => initialSelectedKey !== toKey(a))
-                .map((address) => {
-                  const key = toKey(address);
-                  return (
-                    <AddressListItem
-                      key={key}
-                      isSelected={toKey(selected) === toKey(address)}
-                      onSelect={select}
-                      address={address}
-                    />
-                  );
-                })}
+              {additionalAddresses.map((address) => {
+                const key = toKey(address);
+                return (
+                  <AddressListItem
+                    key={key}
+                    isSelected={toKey(selected) === toKey(address)}
+                    onSelect={select}
+                    address={address}
+                  />
+                );
+              })}
             </List>
-            <Tooltip
-              label={
-                limit >= addresses.length
-                  ? "No further addresses to display"
-                  : undefined
-              }
-            >
-              <Button
-                variant={"ghost"}
-                mt={4}
-                onClick={() => setLimit(limit + 10)}
-                disabled={limit >= addresses.length}
+            <HStack mt={4} justify="space-between">
+              <Tooltip
+                label={
+                  limit >= addresses.length
+                    ? "No further addresses to display"
+                    : undefined
+                }
               >
-                Show more results
-              </Button>
-            </Tooltip>
+                <Button
+                  variant={"ghost"}
+                  onClick={() =>
+                    setLimit(Math.min(limit + 10, addresses.length))
+                  }
+                  disabled={limit >= addresses.length}
+                >
+                  Show more results
+                </Button>
+              </Tooltip>
+              <Text>
+                {additionalAddresses.length + 1} of {addresses.length} displayed
+              </Text>
+            </HStack>
           </ModalBody>
 
           <ModalFooter>

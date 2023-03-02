@@ -117,14 +117,14 @@ const Home: NextPage<Props> = (props) => {
           onSearch={searchByAddress}
         />
         {selectedAddress && (
-          <VStack>
+          <VStack pl={4} pr={4}>
             <Text>Showing weather for</Text>
             <Text textAlign={"center"}>{formatAddress(selectedAddress)}</Text>
             {addresses.length > 1 && (
               <HStack>
                 <Text>Not the right address?</Text>
                 <Button variant={"ghost"} onClick={onToggle}>
-                  Change address
+                  Change address ({addresses.length - 1} more)
                 </Button>
 
                 {/* modal it is rendered in a Portal, thus can be put anywhere */}
