@@ -23,7 +23,10 @@ export default async function handler(
 
   let location: { longitude: number; latitude: number };
 
-  if (lat && lon && typeof lat === "string" && typeof lon === "string") {
+  const locationIsProvided =
+    lat && lon && typeof lat === "string" && typeof lon === "string";
+  if (locationIsProvided) {
+    // TODO parseFloat may return NaN. Handle this case e.g. with `isFinite`
     location = { longitude: parseFloat(lon), latitude: parseFloat(lat) };
   } else {
     const city = req.query["city"];

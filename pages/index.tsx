@@ -38,6 +38,7 @@ const Home: NextPage<Props> = (props) => {
   }, [data]);
 
   const searchByAddress = async () => {
+    if (!addressSearch) return;
     const res = await fetch(`/api/address?address=${addressSearch}`);
     const data: AddressLookupResponse = await res.json();
     setAddresses(data.candidates);
@@ -49,6 +50,7 @@ const Home: NextPage<Props> = (props) => {
     );
     if (!weatherRes.ok) {
       // TODO handle error
+      return;
     }
     const weatherData: ApiData<typeof weatherCurrentApi> =
       await weatherRes.json();
