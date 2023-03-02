@@ -1,11 +1,20 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import { useToast, VStack } from "@chakra-ui/react";
+import {
+  Button,
+  HStack,
+  Text,
+  useDisclosure,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
+import { isEmpty } from "lodash";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import type { ApiData, ApiData2 } from "../src/api/types";
+import AddressSelectionModal from "../src/components/common/AddressSelectionModal";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
@@ -25,11 +34,19 @@ interface Props {
   weather: WeatherData;
 }
 
+/** @example Coffee Shop - Trafalgar, 15 Trafalgar Street, Consett, County Durham, England, DH8 5, United Kingdom */
+const formatAddress = (address: Address) => {
+  const { PlaceName, Type, Place_addr, CntryName } = address.attributes;
+  return `${Type} - ${PlaceName}, ${Place_addr}, ${CntryName}`;
+};
+
 const Home: NextPage<Props> = (props) => {
   const [weather, setWeather] = useState(props.weather);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddress, selectAddress] = useState<Address | null>(null);
   const [addressSearch, setAddressSearch] = useState("");
   const toast = useToast();
+  const { isOpen, onToggle, onClose } = useDisclosure();
 
   const notifyUserOfError = () =>
     toast({
@@ -46,6 +63,19 @@ const Home: NextPage<Props> = (props) => {
     if (data) setWeather(data?.weather);
   }, [data]);
 
+  const refetchWeather = async (lat: number, lon: number) => {
+    const weatherRes = await fetch(
+      `/api/weather-current?lat=${lat}&lon=${lon}`
+    );
+    if (!weatherRes.ok) {
+      notifyUserOfError();
+      return;
+    }
+    const weatherData: ApiData<typeof weatherCurrentApi> =
+      await weatherRes.json();
+    setWeather(weatherData.weather);
+  };
+
   const searchByAddress = async () => {
     if (!addressSearch) return;
     const res = await fetch(`/api/address?address=${addressSearch}`);
@@ -56,18 +86,12 @@ const Home: NextPage<Props> = (props) => {
     const data: AddressLookupResponse = await res.json();
     setAddresses(data.candidates);
 
-    if (!data.candidates.length) return;
-    const location = data.candidates[0].location;
-    const weatherRes = await fetch(
-      `/api/weather-current?lat=${location.y}&lon=${location.x}`
-    );
-    if (!weatherRes.ok) {
-      notifyUserOfError();
-      return;
-    }
-    const weatherData: ApiData<typeof weatherCurrentApi> =
-      await weatherRes.json();
-    setWeather(weatherData.weather);
+    if (isEmpty(data.candidates)) return;
+
+    const firstAddress = data.candidates[0];
+    selectAddress(firstAddress);
+    const location = firstAddress.location;
+    await refetchWeather(location.y, location.x);
   };
 
   return (
@@ -92,6 +116,37 @@ const Home: NextPage<Props> = (props) => {
           onInput={setAddressSearch}
           onSearch={searchByAddress}
         />
+        {selectedAddress && (
+          <VStack>
+            <Text>Showing weather for</Text>
+            <Text textAlign={"center"}>{formatAddress(selectedAddress)}</Text>
+            {!isEmpty(addresses) && (
+              <HStack>
+                <Text>Not the right address?</Text>
+                <Button
+                  aria-label="select another address"
+                  variant={"ghost"}
+                  onClick={onToggle}
+                >
+                  Select another
+                </Button>
+
+                {/* modal it is rendered in a Portal, thus can be put anywhere */}
+                <AddressSelectionModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  addresses={addresses}
+                  selectedAddress={selectedAddress}
+                  onConfirm={async (address) => {
+                    selectAddress(address);
+                    const location = address.location;
+                    await refetchWeather(location.y, location.x);
+                  }}
+                />
+              </HStack>
+            )}
+          </VStack>
+        )}
       </VStack>
     </>
   );
