@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import type { ApiData, ApiData2 } from "../src/api/types";
+import AddressSearchInfo from "../src/components/common/AddressSearchInfo";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
 import SearchByAddress from "../src/components/common/SearchByAddress";
@@ -31,6 +32,7 @@ interface Props {
 const FiveDays: NextPage<Props> = (props) => {
   const [weathers, setWeathers] = useState(props.weathers);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddress, selectAddress] = useState<Address | null>(null);
   const [addressSearch, setAddressSearch] = useState("");
   const toast = useToast();
 
@@ -42,6 +44,18 @@ const FiveDays: NextPage<Props> = (props) => {
       isClosable: true,
     });
 
+  const refetchWeather = async (lat: number, lon: number) => {
+    const weatherRes = await fetch(
+      `/api/weather-five-days?lat=${lat}&lon=${lon}`
+    );
+    if (!weatherRes.ok) {
+      notifyUserOfError();
+      return;
+    }
+    const weatherData: ApiData<typeof weatherFiveDaysApi> =
+      await weatherRes.json();
+    setWeathers(weatherData.weathers);
+  };
   const searchByAddress = async () => {
     if (!addressSearch) return;
     const res = await fetch(`/api/address?address=${addressSearch}`);
@@ -53,17 +67,10 @@ const FiveDays: NextPage<Props> = (props) => {
     setAddresses(data.candidates);
 
     if (isEmpty(data.candidates)) return;
-    const location = data.candidates[0].location;
-    const weatherRes = await fetch(
-      `/api/weather-five-days?lat=${location.y}&lon=${location.x}`
-    );
-    if (!weatherRes.ok) {
-      notifyUserOfError();
-      return;
-    }
-    const weatherData: ApiData<typeof weatherFiveDaysApi> =
-      await weatherRes.json();
-    setWeathers(weatherData.weathers);
+    const firstAddress = data.candidates[0];
+    selectAddress(firstAddress);
+    const location = firstAddress.location;
+    await refetchWeather(location.y, location.x);
   };
 
   const { data, loading, error } = useGeolocationBasedWeather<
@@ -99,6 +106,17 @@ const FiveDays: NextPage<Props> = (props) => {
           onInput={setAddressSearch}
           onSearch={searchByAddress}
         />
+        {selectedAddress && (
+          <AddressSearchInfo
+            addresses={addresses}
+            selectedAddress={selectedAddress}
+            onChangeAddress={async (address) => {
+              selectAddress(address);
+              const location = address.location;
+              await refetchWeather(location.y, location.x);
+            }}
+          />
+        )}
         <VStack gap="var(--chakra-space-4) !important">
           {(weathers || props.weathers).map((w, i) => (
             <WeatherBlock key={w.time} weather={w} withLocation={i === 0} />
