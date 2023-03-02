@@ -120,7 +120,7 @@ const Home: NextPage<Props> = (props) => {
           <VStack>
             <Text>Showing weather for</Text>
             <Text textAlign={"center"}>{formatAddress(selectedAddress)}</Text>
-            {!isEmpty(addresses) && (
+            {addresses.length > 1 && (
               <HStack>
                 <Text>Not the right address?</Text>
                 <Button variant={"ghost"} onClick={onToggle}>
