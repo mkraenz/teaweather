@@ -136,7 +136,7 @@ const Home: NextPage<Props> = (props) => {
                   isOpen={isOpen}
                   onClose={onClose}
                   addresses={addresses}
-                  selectedAddress={selectedAddress}
+                  initialSelectedAddress={selectedAddress}
                   onConfirm={async (address) => {
                     selectAddress(address);
                     const location = address.location;
