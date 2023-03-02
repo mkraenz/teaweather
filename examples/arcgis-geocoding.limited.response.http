@@ -1,0 +1,275 @@
+HTTP/1.1 200 
+Date: Wed, 01 Mar 2023 15:36:03 GMT
+Content-Type: application/json;charset=UTF-8
+Content-Length: 1329
+Connection: close
+Cache-Control: max-age=0,must-revalidate
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Vary: Origin
+Server: 
+Set-Cookie: AGS_ROLES="K2+STuNFqePz7C/9qL13/gK0coxD65Q5tnwnorxQk69tz6yHd3yGvI6R9L9Xtc/WoC6uaFNRc+By3Z8DSBKwq90R2OooU31++CKyPc3JvnK5NQ7p+4IfMYasfcV2gKxIJWbiH4Xp9Dj4mrkNyqjDIeZwhNrqiHzav/WBJ9Nr/pmu5+yT1HtWvhKJUzcOHVI4FH5fDB2vChQGW3M8JCulcM65OaN0pGuSIo80A8/vdyU6c3QIP5gT+zq4nt17k5oMHML8fPUfWT/Ky8loub40LaLgJBufT9CToBwaLyzUYprNOQPhSvua2VqO2DIVCbmAuTxEhmiVltMwdhFhefknGK79n5txe887VH2mq9v8Ylg="; Version=1; Max-Age=60; Expires=Wed, 01-Mar-2023 15:37:03 GMT; Path=/arcgis/rest; Secure; HttpOnly
+ETag: "80a0bf50"
+Content-Encoding: gzip
+X-Region: eu-central-1
+
+{
+  "spatialReference": {
+    "wkid": 4326,
+    "latestWkid": 4326
+  },
+  "candidates": [
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": -0.12734999999997854,
+        "y": 51.507710000000031
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Tourist Attraction",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "Trafalgar Square, London, England, WC2N 5",
+        "Country": "GBR",
+        "CntryName": "United Kingdom"
+      },
+      "extent": {
+        "xmin": -0.13234999999997854,
+        "ymin": 51.502710000000029,
+        "xmax": -0.12234999999997853,
+        "ymax": 51.512710000000034
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": -80.143675999999971,
+        "y": 26.649286000000075
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Shopping Center",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "6342 Forest Hill Blvd, West Palm Beach, Florida, 33415",
+        "Country": "USA",
+        "CntryName": "United States"
+      },
+      "extent": {
+        "xmin": -80.144675999999976,
+        "ymin": 26.648286000000073,
+        "xmax": -80.142675999999966,
+        "ymax": 26.650286000000076
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": -123.44418799999994,
+        "y": 48.575345000000027
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Shopping Center",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "7103 W Saanich Rd, Brentwood Bay, British Columbia, V8M 1R1",
+        "Country": "CAN",
+        "CntryName": "Canada"
+      },
+      "extent": {
+        "xmin": -123.44518799999994,
+        "ymin": 48.574345000000029,
+        "xmax": -123.44318799999994,
+        "ymax": 48.576345000000025
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": 9.6622100000000728,
+        "y": 4.0897000000000503
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Specialty Store",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "Banberi, Wouri, Littoral",
+        "Country": "CMR",
+        "CntryName": "Cameroun"
+      },
+      "extent": {
+        "xmin": 9.657210000000072,
+        "ymin": 4.0847000000000504,
+        "xmax": 9.6672100000000736,
+        "ymax": 4.0947000000000502
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": 175.05396000000007,
+        "y": -39.936269999999979
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Shopping Center",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "100 Taupo Quay, Whanganui, 4500",
+        "Country": "NZL",
+        "CntryName": "New Zealand"
+      },
+      "extent": {
+        "xmin": 175.04896000000008,
+        "ymin": -39.941269999999982,
+        "xmax": 175.05896000000007,
+        "ymax": -39.931269999999977
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": 26.767200000000059,
+        "y": -27.974039999999945
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Bar or Pub",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "21 Theron St, Matjhabeng, Free State, 9459",
+        "Country": "ZAF",
+        "CntryName": "South Africa"
+      },
+      "extent": {
+        "xmin": 26.76220000000006,
+        "ymin": -27.979039999999944,
+        "xmax": 26.772200000000058,
+        "ymax": -27.969039999999946
+      }
+    },
+    {
+      "address": "Trafalgar Square, Carrollwood, Florida",
+      "location": {
+        "x": -82.515399999999943,
+        "y": 28.041600000000074
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "City",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "Carrollwood, Florida",
+        "Country": "USA",
+        "CntryName": "United States"
+      },
+      "extent": {
+        "xmin": -82.765399999999943,
+        "ymin": 27.791600000000074,
+        "xmax": -82.265399999999943,
+        "ymax": 28.291600000000074
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": -0.12976999999995087,
+        "y": 51.507200000000068
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Parking",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "Cockspur Court, London, England, SW1Y 5",
+        "Country": "GBR",
+        "CntryName": "United Kingdom"
+      },
+      "extent": {
+        "xmin": -0.13476999999995087,
+        "ymin": 51.502200000000066,
+        "xmax": -0.12476999999995086,
+        "ymax": 51.512200000000071
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": -71.514789999999948,
+        "y": 42.789250000000038
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Building",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "City of Nashua, New Hampshire",
+        "Country": "USA",
+        "CntryName": "United States"
+      },
+      "extent": {
+        "xmin": -71.519789999999944,
+        "ymin": 42.784250000000036,
+        "xmax": -71.509789999999953,
+        "ymax": 42.794250000000041
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": 151.30119000000002,
+        "y": -33.648499999999956
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Nature Reserve",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "New South Wales",
+        "Country": "AUS",
+        "CntryName": "Australia"
+      },
+      "extent": {
+        "xmin": 150.55119000000002,
+        "ymin": -34.398499999999956,
+        "xmax": 152.05119000000002,
+        "ymax": -32.898499999999956
+      }
+    },
+    {
+      "address": "Trafalgar Square",
+      "location": {
+        "x": 27.913010000000043,
+        "y": -26.166289999999947
+      },
+      "score": 95.140000000000001,
+      "attributes": {
+        "Type": "Residential Area",
+        "PlaceName": "Trafalgar Square",
+        "Place_addr": "Barry Hertzog Dr, Johannesburg, Gauteng, 1709",
+        "Country": "ZAF",
+        "CntryName": "South Africa"
+      },
+      "extent": {
+        "xmin": 27.908010000000044,
+        "ymin": -26.171289999999946,
+        "xmax": 27.918010000000042,
+        "ymax": -26.161289999999948
+      }
+    },
+    {
+      "address": "Trafalgar Square East",
+      "location": {
+        "x": 173.28475000000003,
+        "y": -41.275739999999985
+      },
+      "score": 87.079999999999998,
+      "attributes": {
+        "Type": "Hostel",
+        "PlaceName": "Trafalgar Square East",
+        "Place_addr": "335 Trafalgar Sq, Nelson, 7010",
+        "Country": "NZL",
+        "CntryName": "New Zealand"
+      },
+      "extent": {
+        "xmin": 173.27975000000004,
+        "ymin": -41.280739999999987,
+        "xmax": 173.28975000000003,
+        "ymax": -41.270739999999982
+      }
+    }
+  ]
+}

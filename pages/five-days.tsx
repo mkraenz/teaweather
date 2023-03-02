@@ -1,20 +1,28 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import { VStack } from "@chakra-ui/react";
+import { useToast, VStack } from "@chakra-ui/react";
+import { isEmpty } from "lodash";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
-import type { ApiData } from "../src/api/types";
+import type { ApiData, ApiData2 } from "../src/api/types";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
-import SearchByCity from "../src/components/common/SearchByCity";
+import SearchByAddress from "../src/components/common/SearchByAddress";
 import useGeolocationBasedWeather from "../src/components/common/use-geolocation-based-weather.hook";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
 import type { WeatherData } from "../src/components/interfaces";
-import type weatherFiveDays from "./api/weather-five-days";
+import type { AddressHandlerType } from "./api/address/[[...params]]";
+import type {
+  default as weatherFiveDays,
+  default as weatherFiveDaysApi,
+} from "./api/weather-five-days";
 import type { MyGetServerSideProps } from "./_app";
+
+type AddressLookupResponse = ApiData2<AddressHandlerType["find"]>;
+type Address = AddressLookupResponse["candidates"][number];
 
 interface Props {
   weathers: WeatherData[];
@@ -22,19 +30,40 @@ interface Props {
 
 const FiveDays: NextPage<Props> = (props) => {
   const [weathers, setWeathers] = useState(props.weathers);
-  const [locationSearch, setLocationSearch] = useState("");
-  const searchByLocation = async () => {
-    if (!locationSearch) return;
-    const city = encodeURIComponent(locationSearch.split(",")[0]);
-    const country = encodeURIComponent(locationSearch.split(", ")[1] || "de");
-    const res = await fetch(
-      `/api/weather-five-days?city=${city}&countryCode=${country}`
-    );
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addressSearch, setAddressSearch] = useState("");
+  const toast = useToast();
+
+  const notifyUserOfError = () =>
+    toast({
+      title: "Something went wrong. Please try again later.",
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
+
+  const searchByAddress = async () => {
+    if (!addressSearch) return;
+    const res = await fetch(`/api/address?address=${addressSearch}`);
     if (!res.ok) {
-      // TODO handle error
+      notifyUserOfError();
+      return;
     }
-    const data: ApiData<typeof weatherFiveDays> = await res.json();
-    setWeathers(data.weathers);
+    const data: AddressLookupResponse = await res.json();
+    setAddresses(data.candidates);
+
+    if (isEmpty(data.candidates)) return;
+    const location = data.candidates[0].location;
+    const weatherRes = await fetch(
+      `/api/weather-five-days?lat=${location.y}&lon=${location.x}`
+    );
+    if (!weatherRes.ok) {
+      notifyUserOfError();
+      return;
+    }
+    const weatherData: ApiData<typeof weatherFiveDaysApi> =
+      await weatherRes.json();
+    setWeathers(weatherData.weathers);
   };
 
   const { data, loading, error } = useGeolocationBasedWeather<
@@ -66,7 +95,10 @@ const FiveDays: NextPage<Props> = (props) => {
           }`}
           textTransform="capitalize"
         />
-        <SearchByCity onInput={setLocationSearch} onSearch={searchByLocation} />
+        <SearchByAddress
+          onInput={setAddressSearch}
+          onSearch={searchByAddress}
+        />
         <VStack gap="var(--chakra-space-4) !important">
           {(weathers || props.weathers).map((w, i) => (
             <WeatherBlock key={w.time} weather={w} withLocation={i === 0} />

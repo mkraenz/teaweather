@@ -1,21 +1,25 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import { VStack } from "@chakra-ui/react";
+import { useToast, VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
-import type { ApiData } from "../src/api/types";
+import type { ApiData, ApiData2 } from "../src/api/types";
 import Heading1 from "../src/components/common/Heading1";
 import Heading2 from "../src/components/common/Heading2";
 import { colorWorkaroundGetServerSideProps } from "../src/components/common/layout/dark-mode-workaround";
-import SearchByCity from "../src/components/common/SearchByCity";
+import SearchByAddress from "../src/components/common/SearchByAddress";
 import useGeolocationBasedWeather from "../src/components/common/use-geolocation-based-weather.hook";
 import WeatherBlock from "../src/components/common/weather/WeatherBlock";
 import { getLocationUrl } from "../src/components/get-location-url";
 import type { WeatherData } from "../src/components/interfaces";
+import type { AddressHandlerType } from "./api/address/[[...params]]";
 import type weatherCurrentApi from "./api/weather-current";
 import type { MyGetServerSideProps } from "./_app";
+
+type AddressLookupResponse = ApiData2<AddressHandlerType["find"]>;
+type Address = AddressLookupResponse["candidates"][number];
 
 interface Props {
   weather: WeatherData;
@@ -23,20 +27,17 @@ interface Props {
 
 const Home: NextPage<Props> = (props) => {
   const [weather, setWeather] = useState(props.weather);
-  const [locationSearch, setLocationSearch] = useState("");
-  const searchByLocation = async () => {
-    if (!locationSearch) return;
-    const city = encodeURIComponent(locationSearch.split(",")[0]);
-    const country = encodeURIComponent(locationSearch.split(", ")[1] || "de");
-    const res = await fetch(
-      `/api/weather-current?city=${city}&countryCode=${country}`
-    );
-    if (!res.ok) {
-      // TODO handle error
-    }
-    const data: ApiData<typeof weatherCurrentApi> = await res.json();
-    setWeather(data.weather);
-  };
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addressSearch, setAddressSearch] = useState("");
+  const toast = useToast();
+
+  const notifyUserOfError = () =>
+    toast({
+      title: "Something went wrong. Please try again later.",
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
 
   const { data, loading, error } = useGeolocationBasedWeather<
     ApiData<typeof weatherCurrentApi>
@@ -44,6 +45,30 @@ const Home: NextPage<Props> = (props) => {
   useEffect(() => {
     if (data) setWeather(data?.weather);
   }, [data]);
+
+  const searchByAddress = async () => {
+    if (!addressSearch) return;
+    const res = await fetch(`/api/address?address=${addressSearch}`);
+    if (!res.ok) {
+      notifyUserOfError();
+      return;
+    }
+    const data: AddressLookupResponse = await res.json();
+    setAddresses(data.candidates);
+
+    if (!data.candidates.length) return;
+    const location = data.candidates[0].location;
+    const weatherRes = await fetch(
+      `/api/weather-current?lat=${location.y}&lon=${location.x}`
+    );
+    if (!weatherRes.ok) {
+      notifyUserOfError();
+      return;
+    }
+    const weatherData: ApiData<typeof weatherCurrentApi> =
+      await weatherRes.json();
+    setWeather(weatherData.weather);
+  };
 
   return (
     <>
@@ -63,7 +88,10 @@ const Home: NextPage<Props> = (props) => {
         <Heading1 text="TeaWeather" />
         <Heading2 text="Find the perfect weather for your afternoon tea." />
         <WeatherBlock weather={weather} withLocation />
-        <SearchByCity onInput={setLocationSearch} onSearch={searchByLocation} />
+        <SearchByAddress
+          onInput={setAddressSearch}
+          onSearch={searchByAddress}
+        />
       </VStack>
     </>
   );
