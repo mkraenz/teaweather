@@ -123,12 +123,8 @@ const Home: NextPage<Props> = (props) => {
             {!isEmpty(addresses) && (
               <HStack>
                 <Text>Not the right address?</Text>
-                <Button
-                  aria-label="select another address"
-                  variant={"ghost"}
-                  onClick={onToggle}
-                >
-                  Select another
+                <Button variant={"ghost"} onClick={onToggle}>
+                  Change address
                 </Button>
 
                 {/* modal it is rendered in a Portal, thus can be put anywhere */}
