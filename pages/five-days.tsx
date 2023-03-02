@@ -1,5 +1,5 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import { VStack } from "@chakra-ui/react";
+import { useToast, VStack } from "@chakra-ui/react";
 import { isEmpty } from "lodash";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -32,10 +32,23 @@ const FiveDays: NextPage<Props> = (props) => {
   const [weathers, setWeathers] = useState(props.weathers);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressSearch, setAddressSearch] = useState("");
+  const toast = useToast();
+
+  const notifyUserOfError = () =>
+    toast({
+      title: "Something went wrong. Please try again later.",
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
 
   const searchByAddress = async () => {
     if (!addressSearch) return;
     const res = await fetch(`/api/address?address=${addressSearch}`);
+    if (!res.ok) {
+      notifyUserOfError();
+      return;
+    }
     const data: AddressLookupResponse = await res.json();
     setAddresses(data.candidates);
 
@@ -45,7 +58,7 @@ const FiveDays: NextPage<Props> = (props) => {
       `/api/weather-five-days?lat=${location.y}&lon=${location.x}`
     );
     if (!weatherRes.ok) {
-      // TODO handle error
+      notifyUserOfError();
       return;
     }
     const weatherData: ApiData<typeof weatherFiveDaysApi> =

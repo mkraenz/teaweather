@@ -1,5 +1,5 @@
 import { getServerSidePropsWrapper } from "@auth0/nextjs-auth0";
-import { VStack } from "@chakra-ui/react";
+import { useToast, VStack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -29,6 +29,15 @@ const Home: NextPage<Props> = (props) => {
   const [weather, setWeather] = useState(props.weather);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressSearch, setAddressSearch] = useState("");
+  const toast = useToast();
+
+  const notifyUserOfError = () =>
+    toast({
+      title: "Something went wrong. Please try again later.",
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
 
   const { data, loading, error } = useGeolocationBasedWeather<
     ApiData<typeof weatherCurrentApi>
@@ -40,6 +49,10 @@ const Home: NextPage<Props> = (props) => {
   const searchByAddress = async () => {
     if (!addressSearch) return;
     const res = await fetch(`/api/address?address=${addressSearch}`);
+    if (!res.ok) {
+      notifyUserOfError();
+      return;
+    }
     const data: AddressLookupResponse = await res.json();
     setAddresses(data.candidates);
 
@@ -49,7 +62,7 @@ const Home: NextPage<Props> = (props) => {
       `/api/weather-current?lat=${location.y}&lon=${location.x}`
     );
     if (!weatherRes.ok) {
-      // TODO handle error
+      notifyUserOfError();
       return;
     }
     const weatherData: ApiData<typeof weatherCurrentApi> =
