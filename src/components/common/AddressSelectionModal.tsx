@@ -15,6 +15,7 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -75,6 +76,8 @@ const AddressListItem = ({
 const toKey = (address: Address) =>
   `${address.location.x},${address.location.y}`;
 
+const initialLimit = 5;
+
 const AddressSelectionModal = ({
   isOpen,
   onClose,
@@ -89,15 +92,18 @@ const AddressSelectionModal = ({
   onConfirm: (address: Address) => Promise<void>;
 }) => {
   const [selected, select] = useState(initialSelectedAddress);
-  // TODO only show 10 results and allow to 'show more results'
+  const [limit, setLimit] = useState(initialLimit);
   const handleSelect = () => {
     onConfirm(selected);
+    setLimit(initialLimit);
     onClose();
   };
   const handleClose = () => {
     select(initialSelectedAddress);
+    setLimit(initialLimit);
     onClose();
   };
+  const initialSelectedKey = toKey(initialSelectedAddress);
   return (
     <>
       <Modal isOpen={isOpen} onClose={handleClose}>
@@ -107,19 +113,43 @@ const AddressSelectionModal = ({
           <ModalCloseButton />
           <ModalBody>
             <List spacing={3}>
-              {addresses.map((address) => {
-                const key = toKey(address);
-                const isSelected = toKey(selected) === toKey(address);
-                return (
-                  <AddressListItem
-                    key={key}
-                    isSelected={isSelected}
-                    onSelect={select}
-                    address={address}
-                  />
-                );
-              })}
+              {/* always show the initially selected address on top */}
+              <AddressListItem
+                isSelected={toKey(initialSelectedAddress) === toKey(selected)}
+                onSelect={select}
+                address={initialSelectedAddress}
+              />
+              {addresses
+                .slice(0, limit)
+                .filter((a) => initialSelectedKey !== toKey(a))
+                .map((address) => {
+                  const key = toKey(address);
+                  return (
+                    <AddressListItem
+                      key={key}
+                      isSelected={toKey(selected) === toKey(address)}
+                      onSelect={select}
+                      address={address}
+                    />
+                  );
+                })}
             </List>
+            <Tooltip
+              label={
+                limit >= addresses.length
+                  ? "No further addresses to display"
+                  : undefined
+              }
+            >
+              <Button
+                variant={"ghost"}
+                mt={4}
+                onClick={() => setLimit(limit + 10)}
+                disabled={limit >= addresses.length}
+              >
+                Show more results
+              </Button>
+            </Tooltip>
           </ModalBody>
 
           <ModalFooter>
