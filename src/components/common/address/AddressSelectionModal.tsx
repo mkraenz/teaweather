@@ -19,22 +19,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-
-export type Address = {
-  address: string;
-  location: {
-    x: number;
-    y: number;
-  };
-  score: number;
-  attributes: {
-    Type: string;
-    Place_addr: string;
-    PlaceName: string;
-    Country: string;
-    CntryName: string;
-  };
-};
+import type { Address } from "./Address";
 
 const AddressListItem = ({
   onSelect,
