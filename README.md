@@ -1,5 +1,11 @@
 # TeaWeather
 
+A weather app built with Next.js, Vercel, Chakra UI, Auth0, AWS DynamoDB, ArcGIS Geocoding API, OpenWeatherMap.
+
+## Architecture
+
+![Architecture Diagram](./architecture-diagram.svg)
+
 ## Getting Started
 
 Deploy the AWS resources. See [Deploy AWS resources](#deploy-aws-resources).
