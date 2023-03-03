@@ -43,7 +43,7 @@ const AddressSearchInfo: FC<Props> = ({
             Change address ({addresses.length - 1} more)
           </Button>
 
-          {/* modal it is rendered in a Portal, thus can be put anywhere */}
+          {/* modal is rendered in a Portal, thus can be put anywhere */}
           <AddressSelectionModal
             isOpen={isOpen}
             onClose={onClose}

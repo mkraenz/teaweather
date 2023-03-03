@@ -32,19 +32,19 @@ const AddressListItem = ({
 }) => {
   const accentColor = useColorModeValue("cyan.500", "cyan.400");
 
-  const bg = isSelected ? accentColor : undefined;
+  const iconColor = isSelected ? accentColor : undefined;
   return (
     <>
       <ListItem onClick={() => onSelect(address)} display={"flex"}>
         <HStack>
           <ListIcon
             as={isSelected ? StarIcon : TriangleUpIcon}
-            color={bg}
+            color={iconColor}
             boxSize={4}
             transform={isSelected ? undefined : "rotate(90deg)"}
           />
           <Stack gap={0}>
-            {/* chakra puts weird margin on the stack elements https://github.com/chakra-ui/chakra-ui/issues/2578#issuecomment-981121992 */}
+            {/* chakra puts weird margin on Stack https://github.com/chakra-ui/chakra-ui/issues/2578#issuecomment-981121992 */}
             <Text style={{ margin: 0 }}>
               {address.attributes.PlaceName} - {address.attributes.Type}
             </Text>
@@ -78,11 +78,6 @@ const AddressSelectionModal = ({
 }) => {
   const [selected, select] = useState(initialSelectedAddress);
   const [limit, setLimit] = useState(initialLimit);
-  const handleSelect = () => {
-    onConfirm(selected);
-    setLimit(initialLimit);
-    onClose();
-  };
   useEffect(() => {
     // workaround: when searching more than once, the `selected` state got preserved. this forces a reset to the newest search result
     select(initialSelectedAddress);
@@ -90,82 +85,84 @@ const AddressSelectionModal = ({
   const buttonBg = useColorModeValue("cyan.200", "blue.700");
   const buttonHoverBg = useColorModeValue("cyan.100", "blue.800");
 
+  const handleSelect = () => {
+    onConfirm(selected);
+    setLimit(initialLimit);
+    onClose();
+  };
   const handleClose = () => {
     select(initialSelectedAddress);
     setLimit(initialLimit);
     onClose();
   };
+
   const initialSelectedKey = toKey(initialSelectedAddress);
   const additionalAddresses = addresses
     .slice(0, limit)
     .filter((a) => initialSelectedKey !== toKey(a));
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={handleClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Select Address</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <List spacing={3}>
-              {/* always show the initially selected address on top */}
-              <AddressListItem
-                isSelected={toKey(initialSelectedAddress) === toKey(selected)}
-                onSelect={select}
-                address={initialSelectedAddress}
-              />
-              {additionalAddresses.map((address) => {
-                const key = toKey(address);
-                return (
-                  <AddressListItem
-                    key={key}
-                    isSelected={toKey(selected) === toKey(address)}
-                    onSelect={select}
-                    address={address}
-                  />
-                );
-              })}
-            </List>
-            <HStack mt={4} justify="space-between">
-              <Tooltip
-                label={
-                  limit >= addresses.length
-                    ? "No further addresses to display"
-                    : undefined
-                }
-              >
-                <Button
-                  variant={"ghost"}
-                  onClick={() =>
-                    setLimit(Math.min(limit + 10, addresses.length))
-                  }
-                  disabled={limit >= addresses.length}
-                >
-                  Show more results
-                </Button>
-              </Tooltip>
-              <Text>
-                {additionalAddresses.length + 1} of {addresses.length} displayed
-              </Text>
-            </HStack>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button mr={3} variant="ghost" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button
-              variant="solid"
-              onClick={handleSelect}
-              bg={buttonBg}
-              _hover={{ bg: buttonHoverBg }}
+    <Modal isOpen={isOpen} onClose={handleClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Select Address</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <List spacing={3}>
+            {/* always show the initially selected address on top */}
+            <AddressListItem
+              isSelected={toKey(initialSelectedAddress) === toKey(selected)}
+              onSelect={select}
+              address={initialSelectedAddress}
+            />
+            {additionalAddresses.map((address) => {
+              const key = toKey(address);
+              return (
+                <AddressListItem
+                  key={key}
+                  isSelected={toKey(selected) === toKey(address)}
+                  onSelect={select}
+                  address={address}
+                />
+              );
+            })}
+          </List>
+          <HStack mt={4} justify="space-between">
+            <Tooltip
+              label={
+                limit >= addresses.length
+                  ? "No further addresses to display"
+                  : undefined
+              }
             >
-              Confirm
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+              <Button
+                variant={"ghost"}
+                onClick={() => setLimit(Math.min(limit + 10, addresses.length))}
+                disabled={limit >= addresses.length}
+              >
+                Show more results
+              </Button>
+            </Tooltip>
+            <Text>
+              {additionalAddresses.length + 1} of {addresses.length} displayed
+            </Text>
+          </HStack>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button mr={3} variant="ghost" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button
+            variant="solid"
+            onClick={handleSelect}
+            bg={buttonBg}
+            _hover={{ bg: buttonHoverBg }}
+          >
+            Confirm
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 
