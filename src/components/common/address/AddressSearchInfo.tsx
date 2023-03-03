@@ -1,6 +1,7 @@
 import { Button, HStack, Text, useDisclosure, VStack } from "@chakra-ui/react";
 import type { FC } from "react";
-import AddressSelectionModal, { Address } from "./AddressSelectionModal";
+import type { Address } from "./Address";
+import AddressSelectionModal from "./AddressSelectionModal";
 
 interface Props {
   addresses: Address[];

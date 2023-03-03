@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Env } from "../src/api/env";
 import { maybeGetUser } from "../src/api/get-user";
 import type { ApiData, ApiData2 } from "../src/api/types";
+import type { Address } from "../src/components/common/address/Address";
 import AddressSearchInfo from "../src/components/common/address/AddressSearchInfo";
 import SearchByAddress from "../src/components/common/address/SearchByAddress";
 import Heading2 from "../src/components/common/Heading2";
@@ -23,7 +24,6 @@ import type {
 import type { MyGetServerSideProps } from "./_app";
 
 type AddressLookupResponse = ApiData2<AddressHandlerType["find"]>;
-type Address = AddressLookupResponse["candidates"][number];
 
 interface Props {
   weathers: WeatherData[];
