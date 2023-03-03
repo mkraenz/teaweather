@@ -87,6 +87,8 @@ const AddressSelectionModal = ({
     // workaround: when searching more than once, the `selected` state got preserved. this forces a reset to the newest search result
     select(initialSelectedAddress);
   }, [initialSelectedAddress]);
+  const buttonBg = useColorModeValue("cyan.200", "blue.700");
+  const buttonHoverBg = useColorModeValue("cyan.100", "blue.800");
 
   const handleClose = () => {
     select(initialSelectedAddress);
@@ -152,7 +154,12 @@ const AddressSelectionModal = ({
             <Button mr={3} variant="ghost" onClick={handleClose}>
               Cancel
             </Button>
-            <Button variant="solid" onClick={handleSelect}>
+            <Button
+              variant="solid"
+              onClick={handleSelect}
+              bg={buttonBg}
+              _hover={{ bg: buttonHoverBg }}
+            >
               Confirm
             </Button>
           </ModalFooter>

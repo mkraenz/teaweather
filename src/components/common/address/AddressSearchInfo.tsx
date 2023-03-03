@@ -1,4 +1,11 @@
-import { Button, HStack, Text, useDisclosure, VStack } from "@chakra-ui/react";
+import {
+  Button,
+  HStack,
+  Text,
+  useColorModeValue,
+  useDisclosure,
+  VStack,
+} from "@chakra-ui/react";
 import type { FC } from "react";
 import type { Address } from "./Address";
 import AddressSelectionModal from "./AddressSelectionModal";
@@ -21,15 +28,18 @@ const AddressSearchInfo: FC<Props> = ({
   onChangeAddress,
 }) => {
   const { isOpen, onToggle, onClose } = useDisclosure();
+  const color = useColorModeValue("gray.600", "gray.300");
 
   return (
     <VStack pl={4} pr={4}>
-      <Text>Showing weather for</Text>
-      <Text textAlign={"center"}>{formatAddress(selectedAddress)}</Text>
+      <Text color={color}>Showing weather for</Text>
+      <Text color={color} textAlign={"center"}>
+        {formatAddress(selectedAddress)}
+      </Text>
       {addresses.length > 1 && (
         <HStack>
-          <Text>Not the right address?</Text>
-          <Button variant={"ghost"} onClick={onToggle}>
+          <Text color={color}>Not the right address?</Text>
+          <Button variant={"outline"} color={color} onClick={onToggle}>
             Change address ({addresses.length - 1} more)
           </Button>
 
